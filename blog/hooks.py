@@ -1,3 +1,6 @@
+from blog.www import Frontend
+
+
 app_name = "blog"
 app_title = "Blog"
 app_publisher = "NexTash"
@@ -137,13 +140,16 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
+doc_events = {
 # 	"*": {
 # 		"on_update": "method",
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
-# 	}
-# }
+
+    "User" : {
+        "after_insert": "blog.api.create_blogger_profile"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
@@ -247,3 +253,5 @@ app_license = "mit"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+
+website_route_rules = [{'from_route': '/Frontend/<path:app_path>', 'to_route': 'Frontend'}, {'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'}, {'from_route': '/Frontend/<path:app_path>', 'to_route': 'Frontend'},]
