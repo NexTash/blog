@@ -8,6 +8,7 @@ import socket from "../../../doppio/libs/controllers/socket";
 import Auth from "../../../doppio/libs/controllers/auth";
 import { FrappeUI, setConfig, frappeRequest } from "frappe-ui";
 import "frappe-ui/style.css";
+import "./style.css";
 
 const app = createApp(App);
 const auth = reactive(new Auth());

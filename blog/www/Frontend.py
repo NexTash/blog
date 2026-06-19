@@ -9,6 +9,7 @@ def get_context():
 	context = frappe._dict()
 	context.boot = get_boot()
 	context.boot.csrf_token = csrf_token
+	context.title = "Latest Blogs"
 	return context
 
 

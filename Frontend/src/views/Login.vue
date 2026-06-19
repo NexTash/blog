@@ -1,91 +1,119 @@
 <template>
-	<div class="min-h-screen bg-[#f9f9f9] flex items-center justify-center px-4">
-		<!-- Login Card -->
-		<div class="max-w-md w-full bg-white border border-gray-200 p-8 shadow-sm rounded-sm">
-
-			<!-- Branding Header -->
-			<div class="text-center mb-10">
-				<h1 class="text-3xl font-extrabold text-[#333] tracking-tight">NextNews</h1>
-				<p class="text-[11px] text-gray-500 mt-2 font-bold uppercase tracking-[0.2em]">Blogger Portal</p>
-			</div>
-
-			<!-- Form -->
-			<form @submit.prevent="login" class="space-y-6">
-
-				<!-- Username Field -->
-				<div>
-					<label for="email" class="block text-xs font-black text-gray-700 uppercase tracking-widest mb-2">
-						Username
-					</label>
-					<input type="text" v-model="email" placeholder="Enter username"
-						class="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-1 focus:ring-[#c80000] focus:border-[#c80000] outline-none transition-all placeholder:text-gray-300 text-sm" />
+	<main class="min-h-[calc(100vh-280px)] bg-[#f6f3ee] px-4 py-14">
+		<div class="mx-auto w-full max-w-md">
+			<div class="surface p-8 md:p-10">
+				<!-- Form heading -->
+				<div class="mb-8 border-b border-gray-100 pb-6 text-center">
+					<h2 class="text-2xl font-black tracking-tight text-gray-900">Welcome back</h2>
+					<p class="kicker mt-2">
+						Blogger Portal
+					</p>
 				</div>
 
-				<!-- Password Field -->
-				<div>
-					<label for="password" class="block text-xs font-black text-gray-700 uppercase tracking-widest mb-2">
-						Password
-					</label>
-					<input type="password" v-model="password" placeholder="••••••••"
-						class="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-1 focus:ring-[#c80000] focus:border-[#c80000] outline-none transition-all placeholder:text-gray-300 text-sm" />
+				<!-- Error banner -->
+				<div
+					v-if="errorMsg"
+					class="mb-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3"
+				>
+					<svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+					</svg>
+					<p class="text-sm font-medium text-red-700">{{ errorMsg }}</p>
 				</div>
 
-				<!-- Sign In Button -->
-				<button type="submit"
-					class="w-full bg-[#c80000] hover:bg-[#a00000] text-white font-bold py-3 uppercase tracking-widest text-xs transition-colors shadow-md active:scale-[0.98]">
-					Sign in
-				</button>
+				<!-- Form -->
+				<form @submit.prevent="login" class="space-y-5">
+					<div>
+						<label for="username" class="form-label">Username</label>
+						<input
+							id="username"
+							v-model="email"
+							type="text"
+							required
+							autocomplete="username"
+							placeholder="Enter username"
+							class="form-input"
+						/>
+					</div>
 
-				<p class="text-center text-[14px] text-gray-500">
-					Don't have an account? <router-link to="/signup" class="text-[#c80000] hover:text-[#a00000]">Sign
-						up</router-link>
-				</p>
-			</form>
+					<div>
+						<label for="password" class="form-label">Password</label>
+						<input
+							id="password"
+							v-model="password"
+							type="password"
+							required
+							autocomplete="current-password"
+							placeholder="••••••••"
+							class="form-input"
+						/>
+					</div>
 
-			<!-- Decorative Footer -->
-			<div class="mt-8 pt-6 border-t border-gray-100 text-center">
-				<router-link to="/"
-					class="text-[10px] font-bold text-gray-400 hover:text-[#c80000] uppercase tracking-widest transition-colors">
-					← Back to Homepage
-				</router-link>
+					<button
+						type="submit"
+						:disabled="loading"
+						class="btn-primary w-full justify-center disabled:cursor-not-allowed disabled:bg-gray-400"
+					>
+						{{ loading ? "Signing in…" : "Sign In" }}
+					</button>
+				</form>
+
+				<!-- Footer link -->
+				<div class="mt-8 border-t border-gray-100 pt-6 text-center">
+					<p class="text-xs font-medium text-gray-500">
+						Don't have an account?
+						<router-link to="/signup" class="font-bold text-[#b42318] hover:underline">Create one</router-link>
+					</p>
+				</div>
 			</div>
 		</div>
-	</div>
+	</main>
 </template>
 
-<script>
-export default {
-	data() {
-		return {
-			email: null,
-			password: null,
-		};
-	},
-	inject: ["$auth"],
-	async mounted() {
-		if (this.$route?.query?.route) {
-			this.redirect_route = this.$route.query.route;
-			this.$router.replace({ query: null });
-		}
-	},
-	methods: {
-		async login() {
-			if (this.email && this.password) {
-				let res = await this.$auth.login(this.email, this.password);
-				if (res) {
-					// Navigates to Frontend as requested
-					this.$router.push({ name: "Home" });
-				}
-			}
-		},
+<script setup>
+import { ref, inject } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-	},
+const router = useRouter();
+const route = useRoute();
+const auth = inject("$auth");
+
+const email = ref("");
+const password = ref("");
+const loading = ref(false);
+const errorMsg = ref("");
+
+const login = async () => {
+	if (!email.value || !password.value) {
+		errorMsg.value = "Please enter your username and password.";
+		return;
+	}
+
+	errorMsg.value = "";
+	loading.value = true;
+
+	try {
+		const res = await auth.login(email.value, password.value);
+		if (res) {
+			const redirect = route.query.route || "/";
+			router.push(redirect);
+		} else {
+			errorMsg.value = "Invalid credentials. Please try again.";
+		}
+	} catch (err) {
+		errorMsg.value = err?.message || "Login failed. Please try again.";
+	} finally {
+		loading.value = false;
+	}
 };
 </script>
 
 <style scoped>
-/* Ensuring the font feels like a modern news site */
-input {
-	font-family: sans-serif;
+.form-label {
+	@apply mb-2 block text-xs font-black uppercase tracking-[0.14em] text-gray-700;
+}
+
+.form-input {
+	@apply w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition-all placeholder:text-gray-300 focus:border-[#b42318] focus:ring-2 focus:ring-[#f5d8d4];
 }
 </style>

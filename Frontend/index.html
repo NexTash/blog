@@ -7,15 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@normal;400;500;700;900&display=swap" rel="stylesheet">
-  <title>frontend</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <title>NextNews</title>
 </head>
 
 <body>
   <div id="app"></div>
   <script>
     window.csrf_token = '{{ frappe.session.csrf_token }}';
-    // TODO: load boot data here (context file is created in `www` directory)
   </script>
   <script type="module" src="/src/main.js"></script>
 </body>
