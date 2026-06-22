@@ -10,7 +10,7 @@
 				<article
 					v-for="post in missedPosts"
 					:key="post.name"
-					class="surface group p-6 transition-all hover:-trangray-y-1 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)]"
+					class="surface group p-6 transition-all hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)]"
 				>
 					<span class="block text-[11px] font-black uppercase tracking-[0.14em] text-[#b42318]">
 						{{ post.blog_category || "Uncategorized" }}

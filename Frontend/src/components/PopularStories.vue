@@ -10,7 +10,7 @@
 				<article
 					v-for="(post, i) in popularPosts"
 					:key="post.name"
-					class="surface group relative p-6 transition-all hover:-trangray-y-1 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)]"
+					class="surface group relative p-6 transition-all hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)]"
 				>
 					<!-- Rank number -->
 					<span class="mb-3 block text-4xl font-black leading-none text-gray-100 transition-colors group-hover:text-[#f5d8d4]">

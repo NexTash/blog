@@ -4,12 +4,15 @@
 		<div class="bg-gray-900 px-4 py-2 text-white md:px-8">
 			<div class="mx-auto flex max-w-7xl items-center justify-between gap-4 text-[11px] font-bold uppercase tracking-[0.16em] text-gray-300 sm:text-xs">
 				<span>{{ formattedDate }}</span>
-				<span class="hidden sm:inline">Independent stories, fresh perspectives</span>
+				<span class="hidden items-center gap-2 sm:flex">
+					<span class="inline-block h-1 w-1 rounded-full bg-[#f97316]"></span>
+					Independent stories, fresh perspectives
+				</span>
 			</div>
 		</div>
 
 		<!-- Brand + auth actions -->
-		<div class="px-4 py-6 md:px-8 md:py-8">
+		<div class="px-4 py-4 md:px-4 md:py-4">
 			<div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
 				<!-- Brand -->
 				<router-link to="/" class="group max-w-2xl">
@@ -24,27 +27,48 @@
 
 				<!-- Guest actions -->
 				<div v-if="!auth?.isLoggedIn" class="flex flex-wrap items-center gap-3">
-					<button @click="goToLogin" class="btn-secondary">Login</button>
-					<button @click="goToSignup" class="btn-primary">Signup</button>
+					<button @click="goToLogin" class="btn-secondary">Sign In</button>
+					<button @click="goToSignup" class="btn-primary">
+						<svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+						</svg>
+						Get Started
+					</button>
 				</div>
 
 				<!-- Authenticated actions -->
-				<div v-else class="flex flex-col items-start gap-3 md:items-end">
+				<div v-else class="flex flex-col items-start gap-4 md:items-end">
 					<div class="flex flex-wrap items-center gap-3">
-						<button @click="goToCreatePost" class="btn-primary">New Story</button>
-						<span class="max-w-[220px] truncate rounded-full bg-gray-100 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-gray-700">
-							{{ auth.user }}
-						</span>
+						<button @click="goToCreatePost" class="btn-primary gap-1.5">
+							<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+							</svg>
+							New Story
+						</button>
+						<!-- <div class="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2"> -->
+							<!-- <div class="flex h-6 w-6 items-center justify-center rounded-full bg-[#b42318] text-[10px] font-black text-white uppercase">
+								{{ (auth.user || "?")[0] }}
+							</div> -->
+							<!-- <span class="max-w-[180px] truncate text-xs font-black uppercase tracking-[0.12em] text-gray-700">
+								{{ auth.user }}
+							</span> -->
+						<!-- </div> -->
 					</div>
 					<button
 						@click="handleLogout"
-						class="text-xs font-black uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-[#b42318]"
+						class="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-[#b42318]"
 					>
-						Logout
+						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+						</svg>
+						Sign Out
 					</button>
 				</div>
 			</div>
 		</div>
+
+		<!-- Decorative accent line -->
+		<div class="h-[3px] w-full bg-gradient-to-r from-[#b42318] via-[#f97316] to-transparent"></div>
 	</header>
 </template>
 

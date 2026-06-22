@@ -6,11 +6,11 @@ import authRoutes from "./auth";
 const routes = [
 	{ path: "/", name: "Home", component: Home },
 	{ path: "/post/:name", name: "PostDetail", component: PostDetail },
-	{
-		path: "/category/:slug",
-		name: "Category",
-		component: () => import("../views/Category.vue"),
-	},
+	// {
+	// 	path: "/category/:slug",
+	// 	name: "Category",
+	// 	component: () => import("../views/Category.vue"),
+	// },
 	{
 		path: "/create-post",
 		name: "CreatePost",

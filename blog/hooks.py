@@ -142,12 +142,15 @@ home_page = "Frontend"
 
 doc_events = {
 # 	"*": {
-# 		"on_update": "method",
+# 		"on_update": "method",.
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
 
     "User" : {
         "after_insert": "blog.api.create_blogger_profile"
+    },
+    "User Permission": {
+        "after_insert": "blog.api.remove_user_permission"
     }
 }
 

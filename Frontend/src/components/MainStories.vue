@@ -1,5 +1,5 @@
 <template>
-	<section id="latest" class="bg-[#f6f3ee] px-4 py-8 font-sans md:py-12">
+	<section id="latest" class="bg-[#f6f3ee] px-4 py-8 font-sans md:py-8">
 		<div class="mx-auto max-w-7xl">
 
 			<!-- Loading state -->
@@ -14,7 +14,7 @@
 				<!-- ── COLUMN 1: Main Carousel ────────────────────────────── -->
 				<div class="space-y-4 md:col-span-2 lg:col-span-1">
 					<!-- Header row -->
-					<div class="flex h-12 items-center justify-between border-b border-gray-200 pb-2">
+					<!-- <div class="flex h-12 items-center justify-between border-b border-gray-200 pb-2"> -->
 						<!-- <h2 class="section-accent text-lg font-extrabold uppercase tracking-tight text-gray-900 md:text-xl">
 							Main Stories
 						</h2>
@@ -38,7 +38,7 @@
 								</svg>
 							</button>
 						</div> -->
-					</div>
+					<!-- </div> -->
 
 					<!-- Carousel -->
 					<div class="group relative h-[300px] w-full overflow-hidden rounded-lg bg-gray-900 shadow-[0_22px_60px_rgba(15,23,42,0.22)] md:h-[400px] lg:h-[352px]">
@@ -95,11 +95,11 @@
 
 				<!-- ── COLUMN 2: Editor's Pick ────────────────────────────── -->
 				<div class="space-y-4">
-					<div class="flex h-12 items-center border-b border-gray-200 pb-2">
+					<!-- <div class="flex h-12 items-center border-b border-gray-200 pb-2"> -->
 						<!-- <h2 class="section-accent text-lg font-extrabold uppercase text-gray-900">
 							Editor's Pick
 						</h2> -->
-					</div>
+					<!-- </div> -->
 
 					<div class="grid grid-cols-1 gap-2">
 						<div
@@ -138,11 +138,11 @@
 
 				<!-- ── COLUMN 3: Trending ─────────────────────────────────── -->
 				<div class="space-y-4">
-					<div class="flex h-12 items-center border-b border-gray-200 pb-2">
+					<!-- <div class="flex h-12 items-center border-b border-gray-200 pb-2"> -->
 						<!-- <h2 class="section-accent text-lg font-extrabold uppercase text-gray-900">
 							Trending
 						</h2> -->
-					</div>
+					<!-- </div> -->
 
 					<div class="grid grid-cols-1 gap-2">
 						<div
