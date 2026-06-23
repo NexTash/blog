@@ -11,6 +11,14 @@ app_license = "mit"
 # Apps
 # ------------------
 
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            ["name", "in", ["Blog Post-custom_backlinks"]]
+        ]
+    }
+]
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
