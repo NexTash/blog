@@ -56,6 +56,26 @@
 				<!-- Authenticated actions -->
 				<div v-else class="flex flex-col items-start gap-4 md:items-end">
 					<div class="flex flex-wrap items-center gap-3">
+						<button
+							v-if="isAdministrator"
+							@click="goToBackendPosts"
+							class="btn-secondary gap-1.5"
+						>
+							<svg
+								class="h-3.5 w-3.5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2.5"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M3 7h18M6 7v13h12V7M9 11h6M9 15h6M10 3h4a2 2 0 012 2v2H8V5a2 2 0 012-2z"
+								/>
+							</svg>
+							Backend Posts
+						</button>
 						<button @click="goToCreatePost" class="btn-primary gap-1.5">
 							<svg
 								class="h-3.5 w-3.5"
@@ -112,16 +132,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, inject } from "vue";
+import { ref, computed, onMounted, onUnmounted, inject, watch } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const now = ref(new Date());
 const auth = inject("$auth", null);
+const currentUser = ref(auth?.user || auth?.cookie?.user_id || null);
 
 const goToLogin = () => router.push("/login");
 const goToSignup = () => router.push("/signup");
 const goToCreatePost = () => router.push("/create-post");
+const goToBackendPosts = () => {
+	window.location.href = "http://localhost:8000/app/private/blog-post-";
+};
+
+const isAdministrator = computed(() => currentUser.value === "Administrator");
 
 const handleLogout = async () => {
 	await auth?.logout?.();
@@ -137,11 +163,32 @@ const formattedDate = computed(() =>
 	}),
 );
 
+async function refreshCurrentUser() {
+	if (!auth?.isLoggedIn) {
+		currentUser.value = null;
+		return;
+	}
+
+	try {
+		const response = await fetch("/api/method/frappe.auth.get_logged_user");
+		const data = await response.json();
+		currentUser.value = data?.message || auth?.cookie?.user_id || null;
+	} catch {
+		currentUser.value = auth?.cookie?.user_id || null;
+	}
+}
+
 let timer;
 onMounted(() => {
+	refreshCurrentUser();
 	timer = setInterval(() => {
 		now.value = new Date();
 	}, 60000);
 });
 onUnmounted(() => clearInterval(timer));
+
+watch(
+	() => auth?.isLoggedIn,
+	() => refreshCurrentUser(),
+);
 </script>

@@ -1,4 +1,5 @@
 import json
+import random
 from urllib.parse import parse_qs, urlparse
 
 import frappe
@@ -187,12 +188,12 @@ def remove_user_permission(doc=None, method=None):
 
 @frappe.whitelist(allow_guest=True)
 def get_advertisement():
-	return frappe.get_all(
+	advertisements = frappe.get_all(
 		"Advertisement",
 		filters={"status": "Accepted"},
-		fields=["*"],
-		order_by="creation desc",
+		fields=["name", "title", "link", "image"],
 	)
+	return random.sample(advertisements, min(len(advertisements), 3))
 
 
 @frappe.whitelist(allow_guest=True)

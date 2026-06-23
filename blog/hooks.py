@@ -13,9 +13,9 @@ app_license = "mit"
 
 fixtures = [
     {
-        "doctype": "Custom Field",
+        "doctype": "Workspace",
         "filters": [
-            ["name", "in", ["Blog Post-custom_backlinks"]]
+            ["module", "=", "blog"]
         ]
     }
 ]
