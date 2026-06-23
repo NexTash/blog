@@ -30,7 +30,7 @@ const blogs = blogsResource;
 const route = useRoute();
 
 // Auth pages skip the news Navbar + Slider (but keep Header + Footer)
-const AUTH_PAGES = ["Login", "Signup"];
+const AUTH_PAGES = ["Login", "Signup", "ForgotPassword", "ResetPassword"];
 const isAuthPage = computed(() => AUTH_PAGES.includes(route.name));
 
 onMounted(() => {

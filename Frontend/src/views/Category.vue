@@ -16,7 +16,10 @@
 				<p class="mt-4 text-sm font-medium text-gray-400">Loading...</p>
 			</div>
 
-			<div v-else-if="posts.length" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<div
+				v-else-if="posts.length"
+				class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+			>
 				<article
 					v-for="post in posts"
 					:key="post.name"
@@ -39,18 +42,25 @@
 					<!-- Card body -->
 					<div class="flex min-h-[220px] flex-col p-6">
 						<router-link :to="{ name: 'PostDetail', params: { name: post.name } }">
-							<h3 class="line-clamp-2 text-xl font-black leading-tight text-gray-900 transition-colors group-hover:text-[#b42318]">
+							<h3
+								class="line-clamp-2 text-xl font-black leading-tight text-gray-900 transition-colors group-hover:text-[#b42318]"
+							>
 								{{ post.title }}
 							</h3>
 						</router-link>
 
-						<div class="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">
+						<div
+							class="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400"
+						>
 							{{ formatDate(post.published_on) }}
 							<span class="mx-1">/</span>
 							{{ post.blogger || "Admin" }}
 						</div>
 
-						<p v-if="post.blog_intro" class="mt-4 line-clamp-3 text-sm leading-6 text-gray-600">
+						<p
+							v-if="post.blog_intro"
+							class="mt-4 line-clamp-3 text-sm leading-6 text-gray-600"
+						>
 							{{ post.blog_intro }}
 						</p>
 
@@ -65,12 +75,28 @@
 			</div>
 
 			<!-- Empty state -->
-			<div v-else class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white py-24 text-center">
-				<svg class="mb-4 h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+			<div
+				v-else
+				class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white py-24 text-center"
+			>
+				<svg
+					class="mb-4 h-12 w-12 text-gray-300"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.5"
+						d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+					/>
 				</svg>
 				<p class="text-lg font-bold text-gray-400">No stories in this category yet.</p>
-				<router-link to="/" class="mt-4 text-xs font-black uppercase tracking-[0.16em] text-[#b42318] hover:underline">
+				<router-link
+					to="/"
+					class="mt-4 text-xs font-black uppercase tracking-[0.16em] text-[#b42318] hover:underline"
+				>
 					← Browse all stories
 				</router-link>
 			</div>
@@ -93,7 +119,7 @@ onMounted(() => {
 
 const categoryTitle = computed(() => {
 	const cat = (categoriesResource.data || []).find((c) => c.name === route.params.slug);
-	return cat ? (cat.title || cat.name) : route.params.slug;
+	return cat ? cat.title || cat.name : route.params.slug;
 });
 
 const loading = computed(() => blogsResource.loading);

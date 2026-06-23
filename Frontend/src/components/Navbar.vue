@@ -1,5 +1,7 @@
 <template>
-	<nav class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 text-gray-900 shadow-sm backdrop-blur">
+	<nav
+		class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 text-gray-900 shadow-sm backdrop-blur"
+	>
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div class="flex h-14 items-center justify-between">
 				<!-- Desktop nav links + hamburger -->
@@ -28,8 +30,15 @@
 						</svg>
 					</button>
 
-					<div class="hidden items-center gap-1 text-sm font-black uppercase tracking-[0.12em] md:flex">
-						<router-link to="/" class="nav-link" active-class="text-[#b42318] bg-[#fff4f1]">Home</router-link>
+					<div
+						class="hidden items-center gap-1 text-sm font-black uppercase tracking-[0.12em] md:flex"
+					>
+						<router-link
+							to="/"
+							class="nav-link"
+							active-class="text-[#b42318] bg-[#fff4f1]"
+							>Home</router-link
+						>
 						<a href="#latest" class="nav-link" @click="closeMobile">Latest</a>
 						<a href="#popular" class="nav-link" @click="closeMobile">Popular</a>
 						<a href="#all-stories" class="nav-link" @click="closeMobile">Stories</a>
@@ -43,11 +52,35 @@
 					class="flex h-10 w-10 items-center justify-center rounded-full transition-colors"
 					:aria-label="isSearchOpen ? 'Close search' : 'Open search'"
 				>
-					<svg v-if="!isSearchOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					<svg
+						v-if="!isSearchOpen"
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="3"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
 					</svg>
-					<svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					<svg
+						v-else
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="3"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -55,7 +88,10 @@
 
 		<!-- Search panel -->
 		<transition name="slide-fade">
-			<div v-if="isSearchOpen" class="absolute right-0 top-full z-50 w-full sm:right-4 sm:w-[460px]">
+			<div
+				v-if="isSearchOpen"
+				class="absolute right-0 top-full z-50 w-full sm:right-4 sm:w-[460px]"
+			>
 				<div class="surface rounded-t-none p-4">
 					<div class="flex overflow-hidden rounded-md border border-gray-300 bg-white">
 						<input
@@ -89,14 +125,21 @@
 								class="h-12 w-12 shrink-0 rounded-md object-cover"
 							/>
 							<div class="min-w-0">
-								<p class="line-clamp-1 text-sm font-bold text-gray-900">{{ post.title }}</p>
-								<p class="mt-0.5 text-[11px] font-bold uppercase tracking-wider text-[#b42318]">
+								<p class="line-clamp-1 text-sm font-bold text-gray-900">
+									{{ post.title }}
+								</p>
+								<p
+									class="mt-0.5 text-[11px] font-bold uppercase tracking-wider text-[#b42318]"
+								>
 									{{ post.blog_category || "General" }}
 								</p>
 							</div>
 						</router-link>
 					</div>
-					<p v-else-if="search.trim().length > 1" class="mt-2 px-3 py-3 text-sm text-gray-400">
+					<p
+						v-else-if="search.trim().length > 1"
+						class="mt-2 px-3 py-3 text-sm text-gray-400"
+					>
 						No stories found for "{{ search }}"
 					</p>
 				</div>
@@ -105,7 +148,10 @@
 
 		<!-- Mobile menu -->
 		<transition name="slide-fade">
-			<div v-if="isMobileMenuOpen" class="border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden">
+			<div
+				v-if="isMobileMenuOpen"
+				class="border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden"
+			>
 				<router-link to="/" class="mobile-link" @click="closeMobile">Home</router-link>
 				<a href="#latest" class="mobile-link" @click="closeMobile">Latest</a>
 				<a href="#popular" class="mobile-link" @click="closeMobile">Popular</a>
@@ -151,7 +197,7 @@ const searchResults = computed(() => {
 				p.title?.toLowerCase().includes(q) ||
 				p.blog_category?.toLowerCase().includes(q) ||
 				p.blog_intro?.toLowerCase().includes(q) ||
-				p.content?.toLowerCase().includes(q)
+				p.content?.toLowerCase().includes(q),
 		)
 		.slice(0, 6);
 });

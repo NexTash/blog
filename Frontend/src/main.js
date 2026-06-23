@@ -7,6 +7,7 @@ import call from "../../../doppio/libs/controllers/call";
 import socket from "../../../doppio/libs/controllers/socket";
 import Auth from "../../../doppio/libs/controllers/auth";
 import { FrappeUI, setConfig, frappeRequest } from "frappe-ui";
+import { installTrafficTracker } from "./utils/traffic";
 import "frappe-ui/style.css";
 import "./style.css";
 
@@ -26,9 +27,6 @@ app.provide("$auth", auth);
 app.provide("$call", call);
 app.provide("$socket", socket);
 
-// Configure route gaurds
-router.beforeEach(async (to, from, next) => {
-	next();
-});
+installTrafficTracker(router);
 
 app.mount("#app");

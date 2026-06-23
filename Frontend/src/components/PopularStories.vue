@@ -3,32 +3,51 @@
 		<div class="mx-auto max-w-7xl">
 			<!-- Section heading -->
 			<div class="section-accent mb-6">
-				<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">Popular Stories</h2>
+				<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">
+					Popular Stories
+				</h2>
 			</div>
 
-			<div v-if="popularPosts.length" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<div
+				v-if="popularPosts.length"
+				class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+			>
 				<article
 					v-for="(post, i) in popularPosts"
 					:key="post.name"
 					class="surface group relative p-6 transition-all hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)]"
 				>
 					<!-- Rank number -->
-					<span class="mb-3 block text-4xl font-black leading-none text-gray-100 transition-colors group-hover:text-[#f5d8d4]">
+					<span
+						class="mb-3 block text-4xl font-black leading-none text-gray-100 transition-colors group-hover:text-[#f5d8d4]"
+					>
 						{{ String(i + 1).padStart(2, "0") }}
 					</span>
 
-					<span class="block text-[11px] font-black uppercase tracking-[0.14em] text-[#b42318]">
+					<span
+						class="block text-[11px] font-black uppercase tracking-[0.14em] text-[#b42318]"
+					>
 						{{ post.blog_category || "Uncategorized" }}
 					</span>
 
 					<router-link :to="{ name: 'PostDetail', params: { name: post.name } }">
-						<h3 class="mt-2 line-clamp-2 text-[1.05rem] font-black leading-snug text-gray-900 transition-colors group-hover:text-[#b42318]">
+						<h3
+							class="mt-2 line-clamp-2 text-[1.05rem] font-black leading-snug text-gray-900 transition-colors group-hover:text-[#b42318]"
+						>
 							{{ post.title }}
 						</h3>
 					</router-link>
 
-					<div class="mt-4 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">
-						{{ formatDate(post.published_on, { year: "numeric", month: "short", day: "numeric" }) }}
+					<div
+						class="mt-4 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400"
+					>
+						{{
+							formatDate(post.published_on, {
+								year: "numeric",
+								month: "short",
+								day: "numeric",
+							})
+						}}
 						<span class="mx-1">/</span>
 						{{ post.blogger || "Admin" }}
 					</div>
@@ -36,7 +55,10 @@
 			</div>
 
 			<!-- Loading / empty -->
-			<div v-else class="rounded-lg border border-dashed border-gray-300 bg-white py-10 text-center text-sm font-medium text-gray-400">
+			<div
+				v-else
+				class="rounded-lg border border-dashed border-gray-300 bg-white py-10 text-center text-sm font-medium text-gray-400"
+			>
 				Loading popular stories...
 			</div>
 		</div>

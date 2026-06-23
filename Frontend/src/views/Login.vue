@@ -5,9 +5,7 @@
 				<!-- Form heading -->
 				<div class="mb-8 border-b border-gray-100 pb-6 text-center">
 					<h2 class="text-2xl font-black tracking-tight text-gray-900">Welcome back</h2>
-					<p class="kicker mt-2">
-						Blogger Portal
-					</p>
+					<p class="kicker mt-2">Blogger Portal</p>
 				</div>
 
 				<!-- Error banner -->
@@ -15,8 +13,16 @@
 					v-if="errorMsg"
 					class="mb-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3"
 				>
-					<svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+					<svg
+						class="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+						fill="currentColor"
+						viewBox="0 0 20 20"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 					<p class="text-sm font-medium text-red-700">{{ errorMsg }}</p>
 				</div>
@@ -37,7 +43,15 @@
 					</div>
 
 					<div>
-						<label for="password" class="form-label">Password</label>
+						<div class="mb-2 flex items-center justify-between gap-3">
+							<label for="password" class="form-label mb-0">Password</label>
+							<router-link
+								to="/forgot-password"
+								class="text-xs font-bold text-[#b42318] hover:underline"
+							>
+								Forgot password?
+							</router-link>
+						</div>
 						<input
 							id="password"
 							v-model="password"
@@ -62,7 +76,9 @@
 				<div class="mt-8 border-t border-gray-100 pt-6 text-center">
 					<p class="text-xs font-medium text-gray-500">
 						Don't have an account?
-						<router-link to="/signup" class="font-bold text-[#b42318] hover:underline">Create one</router-link>
+						<router-link to="/signup" class="font-bold text-[#b42318] hover:underline"
+							>Create one</router-link
+						>
 					</p>
 				</div>
 			</div>
@@ -73,6 +89,7 @@
 <script setup>
 import { ref, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { getLoginErrorMessage } from "../utils/errors";
 
 const router = useRouter();
 const route = useRoute();
@@ -101,7 +118,7 @@ const login = async () => {
 			errorMsg.value = "Invalid credentials. Please try again.";
 		}
 	} catch (err) {
-		errorMsg.value = err?.message || "Login failed. Please try again.";
+		errorMsg.value = getLoginErrorMessage(err);
 	} finally {
 		loading.value = false;
 	}

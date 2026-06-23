@@ -1,0 +1,150 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-06-23 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "visited_at",
+  "is_guest",
+  "user",
+  "visitor_id",
+  "ip_address",
+  "route_section",
+  "route",
+  "route_name",
+  "page_title",
+  "referrer",
+  "user_agent",
+  "screen_width",
+  "screen_height",
+  "language"
+ ],
+ "fields": [
+  {
+   "fieldname": "visited_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Visited At",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_guest",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Guest",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "visitor_id",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Visitor ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "IP Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "route_section",
+   "fieldtype": "Section Break",
+   "label": "Route"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Route",
+   "read_only": 1
+  },
+  {
+   "fieldname": "route_name",
+   "fieldtype": "Data",
+   "label": "Route Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "page_title",
+   "fieldtype": "Data",
+   "label": "Page Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "referrer",
+   "fieldtype": "Small Text",
+   "label": "Referrer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user_agent",
+   "fieldtype": "Small Text",
+   "label": "User Agent",
+   "read_only": 1
+  },
+  {
+   "fieldname": "screen_width",
+   "fieldtype": "Int",
+   "label": "Screen Width",
+   "read_only": 1
+  },
+  {
+   "fieldname": "screen_height",
+   "fieldtype": "Int",
+   "label": "Screen Height",
+   "read_only": 1
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Data",
+   "label": "Language",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-06-23 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Blog",
+ "name": "Website Traffic Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Website Manager"
+  }
+ ],
+ "read_only": 0,
+ "sort_field": "visited_at",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

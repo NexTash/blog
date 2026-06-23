@@ -4,10 +4,10 @@
 			<div class="surface p-8 md:p-10">
 				<!-- Form heading -->
 				<div class="mb-8 border-b border-gray-100 pb-6 text-center">
-					<h2 class="text-2xl font-black tracking-tight text-gray-900">Create your account</h2>
-					<p class="kicker mt-2">
-						Blogger Registration
-					</p>
+					<h2 class="text-2xl font-black tracking-tight text-gray-900">
+						Create your account
+					</h2>
+					<p class="kicker mt-2">Blogger Registration</p>
 				</div>
 
 				<!-- Success banner -->
@@ -15,8 +15,16 @@
 					v-if="successMsg"
 					class="mb-6 flex items-start gap-3 rounded-md border border-green-200 bg-green-50 px-4 py-3"
 				>
-					<svg class="mt-0.5 h-4 w-4 shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+					<svg
+						class="mt-0.5 h-4 w-4 shrink-0 text-green-600"
+						fill="currentColor"
+						viewBox="0 0 20 20"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 					<p class="text-sm font-medium text-green-700">{{ successMsg }}</p>
 				</div>
@@ -26,8 +34,16 @@
 					v-if="errorMsg"
 					class="mb-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3"
 				>
-					<svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+					<svg
+						class="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+						fill="currentColor"
+						viewBox="0 0 20 20"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 					<p class="text-sm font-medium text-red-700">{{ errorMsg }}</p>
 				</div>
@@ -86,7 +102,9 @@
 				<div class="mt-8 border-t border-gray-100 pt-6 text-center">
 					<p class="text-xs font-medium text-gray-500">
 						Already have an account?
-						<router-link to="/login" class="font-bold text-[#b42318] hover:underline">Sign in</router-link>
+						<router-link to="/login" class="font-bold text-[#b42318] hover:underline"
+							>Sign in</router-link
+						>
 					</p>
 				</div>
 			</div>
@@ -97,6 +115,8 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { blogApi } from "../api/blogServices";
+import { getSignupErrorMessage } from "../utils/errors";
 
 const router = useRouter();
 const loading = ref(false);
@@ -105,37 +125,43 @@ const successMsg = ref("");
 
 const form = reactive({ full_name: "", email: "", password: "" });
 
-const getCsrfToken = () => window.csrf_token || window.frappe?.csrf_token || "";
-
 const handleSignup = async () => {
 	errorMsg.value = "";
 	successMsg.value = "";
+
+	if (!isSignupFormValid()) return;
+
 	loading.value = true;
 
 	try {
-		const response = await fetch("/api/method/blog.api.register_user", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"X-Frappe-CSRF-Token": getCsrfToken(),
-			},
-			body: JSON.stringify(form),
-		});
-
-		const data = await response.json();
-
-		if (data.message) {
-			successMsg.value = "Account created! Redirecting to login…";
-			setTimeout(() => router.push("/login"), 1500);
-		} else {
-			throw new Error(data.exception || data._server_messages || "Registration failed.");
-		}
+		await blogApi.registerUser(form);
+		successMsg.value = "Account created! Redirecting to login…";
+		setTimeout(() => router.push("/login"), 1500);
 	} catch (err) {
-		errorMsg.value = err.message || "Something went wrong. Please try again.";
+		errorMsg.value = getSignupErrorMessage(err);
 	} finally {
 		loading.value = false;
 	}
 };
+
+function isSignupFormValid() {
+	if (!form.full_name.trim()) {
+		errorMsg.value = "Please enter your full name.";
+		return false;
+	}
+
+	if (!form.email.trim() || !/^\S+@\S+\.\S+$/.test(form.email)) {
+		errorMsg.value = "Please enter a valid email address.";
+		return false;
+	}
+
+	if (!form.password || form.password.length < 8) {
+		errorMsg.value = "Password must be at least 8 characters.";
+		return false;
+	}
+
+	return true;
+}
 </script>
 
 <style scoped>
