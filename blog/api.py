@@ -6,7 +6,10 @@ import frappe
 from blog.blog.doctype.website_traffic_log.website_traffic_log import get_request_ip
 from frappe.exceptions import ValidationError
 from frappe.utils import escape_html, get_url, now_datetime
+from frappe.utils.oauth import get_oauth2_authorize_url
 from frappe.utils.file_manager import save_file
+from frappe.utils.password import get_decrypted_password
+from frappe.www.login import sanitize_redirect
 
 
 @frappe.whitelist(allow_guest=True)
@@ -77,6 +80,39 @@ def reset_website_password(key, new_password):
 		frappe.throw(result or "This reset link is invalid or has expired.")
 
 	return {"message": "Password updated successfully. You can continue on the website."}
+
+
+@frappe.whitelist(allow_guest=True, methods=["POST"])
+def get_google_login_url(redirect_to=None):
+	provider = "google"
+	provider_doc = frappe.db.get_value(
+		"Social Login Key",
+		provider,
+		["enable_social_login", "client_id", "base_url"],
+		as_dict=True,
+	)
+
+	client_secret = get_decrypted_password(
+		"Social Login Key",
+		provider,
+		"client_secret",
+		raise_exception=False,
+	)
+	if (
+		not provider_doc
+		or not provider_doc.enable_social_login
+		or not provider_doc.client_id
+		or not provider_doc.base_url
+		or not client_secret
+	):
+		frappe.throw("Google login is not configured.")
+
+	redirect_to = sanitize_redirect(redirect_to) or get_url(
+		"/Frontend/",
+		allow_header_override=False,
+	)
+
+	return get_oauth2_authorize_url(provider, redirect_to)
 
 
 def _password_reset_response():
