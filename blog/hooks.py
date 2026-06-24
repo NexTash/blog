@@ -17,7 +17,7 @@ fixtures = [
         "filters": [
             ["module", "=", "blog"]
         ]
-    }
+    },
 ]
 # required_apps = []
 

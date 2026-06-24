@@ -1,7 +1,7 @@
 import { blogApi } from "../api/blogServices";
 
 const VISITOR_ID_KEY = "nextnews_visitor_id";
-const SESSION_LOGGED_KEY = "nextnews_traffic_logged";
+const SESSION_LOGGED_PREFIX = "nextnews_traffic_logged";
 const MINIMUM_VISIT_MS = 10000;
 
 function createVisitorId() {
@@ -37,22 +37,41 @@ function getTrafficPayload(route) {
 }
 
 export function installTrafficTracker(router) {
-	if (window.sessionStorage.getItem(SESSION_LOGGED_KEY)) return;
-
 	window.setTimeout(() => {
 		const currentRoute = router.currentRoute.value;
-		window.requestIdleCallback?.(() => trackSession(currentRoute)) ||
-			window.setTimeout(() => trackSession(currentRoute), 0);
+		window.requestIdleCallback?.(() => trackCurrentSession(currentRoute)) ||
+			window.setTimeout(() => trackCurrentSession(currentRoute), 0);
 	}, MINIMUM_VISIT_MS);
 }
 
-async function trackSession(route) {
-	if (window.sessionStorage.getItem(SESSION_LOGGED_KEY)) return;
+export async function trackCurrentSession(route) {
+	const user = await getCurrentUser();
+	const sessionKey = getSessionLoggedKey(user);
+
+	if (window.sessionStorage.getItem(sessionKey)) return;
 
 	try {
 		await blogApi.trackTraffic(getTrafficPayload(route));
-		window.sessionStorage.setItem(SESSION_LOGGED_KEY, "1");
+		window.sessionStorage.setItem(sessionKey, "1");
 	} catch {
 		// Analytics must never interrupt browsing.
 	}
+}
+
+async function getCurrentUser() {
+	try {
+		const response = await fetch("/api/method/frappe.auth.get_logged_user");
+		const data = await response.json();
+		return data?.message || "Guest";
+	} catch {
+		return "Guest";
+	}
+}
+
+function getSessionLoggedKey(user) {
+	if (!user || user === "Guest") {
+		return `${SESSION_LOGGED_PREFIX}:guest`;
+	}
+
+	return `${SESSION_LOGGED_PREFIX}:user:${user}`;
 }

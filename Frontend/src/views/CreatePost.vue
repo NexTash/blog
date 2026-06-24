@@ -238,9 +238,11 @@
 
 						<!-- Sidebar -->
 						<aside class="space-y-6">
-							<div class="sticky top-8 space-y-6">
+							<div class="flex flex-col gap-6 lg:sticky lg:top-8">
 								<!-- Publish Card -->
-								<div class="rounded-2xl p-6 bg-black text-white shadow-xl">
+								<div
+									class="order-last rounded-2xl bg-black p-6 text-white shadow-xl lg:order-first"
+								>
 									<h3
 										class="mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 border-b border-gray-800 pb-2"
 									>

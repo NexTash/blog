@@ -1,4 +1,5 @@
 const API_BASE = "/api/method";
+const REQUEST_TIMEOUT_MS = 15000;
 
 export class ApiError extends Error {
 	constructor(message, response, payload) {
@@ -45,8 +46,28 @@ async function parseJson(response) {
 	}
 }
 
+function getTimeoutMessage() {
+	return "This is taking longer than expected. Please check your connection and try again.";
+}
+
+async function fetchWithTimeout(url, options = {}) {
+	const controller = new AbortController();
+	const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+	try {
+		return await fetch(url, { ...options, signal: controller.signal });
+	} catch (error) {
+		if (error.name === "AbortError") {
+			throw new ApiError(getTimeoutMessage(), null, null);
+		}
+		throw error;
+	} finally {
+		window.clearTimeout(timeout);
+	}
+}
+
 export async function request(path, options = {}) {
-	const response = await fetch(`${API_BASE}/${path}`, options);
+	const response = await fetchWithTimeout(`${API_BASE}/${path}`, options);
 	const payload = await parseJson(response);
 
 	if (!response.ok) {
@@ -57,7 +78,7 @@ export async function request(path, options = {}) {
 }
 
 export async function getResource(doctype, name) {
-	const response = await fetch(
+	const response = await fetchWithTimeout(
 		`/api/resource/${encodeURIComponent(doctype)}/${encodeURIComponent(name)}`,
 	);
 	const payload = await parseJson(response);

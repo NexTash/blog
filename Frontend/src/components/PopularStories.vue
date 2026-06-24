@@ -54,12 +54,11 @@
 				</article>
 			</div>
 
-			<!-- Loading / empty -->
 			<div
 				v-else
 				class="rounded-lg border border-dashed border-gray-300 bg-white py-10 text-center text-sm font-medium text-gray-400"
 			>
-				Loading popular stories...
+				No popular stories available yet.
 			</div>
 		</div>
 	</section>

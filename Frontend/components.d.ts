@@ -9,8 +9,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdPosts: typeof import('./src/components/AdPosts.vue')['default']
+    ErrorState: typeof import('./src/components/ErrorState.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
+    HomeSkeleton: typeof import('./src/components/HomeSkeleton.vue')['default']
     MainStories: typeof import('./src/components/MainStories.vue')['default']
     MissedStories: typeof import('./src/components/MissedStories.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']

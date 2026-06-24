@@ -90,6 +90,7 @@
 import { ref, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { getLoginErrorMessage } from "../utils/errors";
+import { trackCurrentSession } from "../utils/traffic";
 
 const router = useRouter();
 const route = useRoute();
@@ -113,7 +114,8 @@ const login = async () => {
 		const res = await auth.login(email.value, password.value);
 		if (res) {
 			const redirect = route.query.route || "/";
-			router.push(redirect);
+			await router.push(redirect);
+			await trackCurrentSession(router.currentRoute.value);
 		} else {
 			errorMsg.value = "Invalid credentials. Please try again.";
 		}

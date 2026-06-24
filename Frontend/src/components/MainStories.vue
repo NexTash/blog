@@ -14,17 +14,6 @@
 			</div>
 
 			<div
-				v-if="shuffledPosts.length === 0"
-				class="flex h-64 flex-col items-center justify-center"
-			>
-				<div
-					class="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-[#b42318]"
-				></div>
-				<p class="animate-pulse font-medium text-gray-500">Fetching latest stories...</p>
-			</div>
-
-			<div
-				v-else
 				class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-4 lg:grid-cols-[2fr_1fr_1fr]"
 			>
 				<div class="space-y-4 md:col-span-2 lg:col-span-1">

@@ -51,7 +51,7 @@
 				v-else
 				class="rounded-lg border border-dashed border-gray-300 bg-white py-10 text-center text-sm font-medium text-gray-400"
 			>
-				Loading...
+				No additional stories available yet.
 			</div>
 		</div>
 	</section>

@@ -112,15 +112,12 @@
 				</button>
 			</div>
 
-			<!-- Loading state -->
+			<!-- Empty state -->
 			<div
 				v-else-if="!posts || posts.length === 0"
 				class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-20"
 			>
-				<div
-					class="mb-4 h-10 w-10 animate-spin rounded-full border-b-2 border-[#b42318]"
-				></div>
-				<p class="font-medium text-gray-500">Loading stories...</p>
+				<p class="font-medium text-gray-500">No stories available yet.</p>
 			</div>
 		</div>
 	</section>
