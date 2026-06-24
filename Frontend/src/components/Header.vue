@@ -144,7 +144,7 @@ const goToLogin = () => router.push("/login");
 const goToSignup = () => router.push("/signup");
 const goToCreatePost = () => router.push("/create-post");
 const goToBackendPosts = () => {
-	window.location.href = "http://localhost:8000/app/private/blog-post-";
+	window.location.href = "/app/private/blog-post-";
 };
 
 const isAdministrator = computed(() => currentUser.value === "Administrator");
