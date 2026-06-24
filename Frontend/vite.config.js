@@ -27,5 +27,20 @@ export default defineConfig({
 		outDir: "../blog/public/Frontend",
 		emptyOutDir: true,
 		target: "es2015",
+		rollupOptions: {
+			checks: {
+				pluginTimings: false,
+			},
+			onLog(level, log, handler) {
+				if (
+					log.code === "INVALID_ANNOTATION" &&
+					log.id?.includes("node_modules/reka-ui/node_modules/@vueuse/core")
+				) {
+					return;
+				}
+
+				handler(level, log);
+			},
+		},
 	},
 });
