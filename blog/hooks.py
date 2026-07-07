@@ -13,10 +13,7 @@ app_license = "mit"
 
 fixtures = [
     {
-        "doctype": "Workspace",
-        "filters": [
-            ["module", "=", "blog"]
-        ]
+        "doctype": "Social Login Key"
     },
 ]
 # required_apps = []
@@ -155,7 +152,8 @@ doc_events = {
 # 		"on_trash": "method"
 
     "User" : {
-        "after_insert": "blog.api.create_blogger_profile"
+        "after_insert": "blog.api.handle_new_user_setup"
+        
     },
     "User Permission": {
         "after_insert": "blog.api.remove_user_permission"

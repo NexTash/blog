@@ -1,7 +1,7 @@
 import json
+from pydoc import doc
 import random
 from urllib.parse import parse_qs, urlparse
-
 import frappe
 from blog.blog.doctype.website_traffic_log.website_traffic_log import get_request_ip
 from frappe.exceptions import ValidationError
@@ -10,30 +10,28 @@ from frappe.utils.oauth import get_oauth2_authorize_url
 from frappe.utils.file_manager import save_file
 from frappe.utils.password import get_decrypted_password
 from frappe.www.login import sanitize_redirect
+from frappe.utils import validate_email_address
 
 
 @frappe.whitelist(allow_guest=True)
 def register_user(email, full_name, password):
-	if frappe.db.exists("User", email):
-		frappe.throw("User with this email already exists")
+    if frappe.db.exists("User", email):
+        frappe.throw("User with this email already exists")
 
-	try:
-		user = frappe.get_doc(
-			{
-				"doctype": "User",
-				"email": email,
-				"first_name": escape_html(full_name),
-				"new_password": password,
-				"enabled": 1,
-				"send_welcome_email": 0,
-			}
-		)
-		user.insert(ignore_permissions=True)
-		user.add_roles("Blogger")
-		frappe.db.commit()
-		return "User registered successfully"
-	except ValidationError as e:
-		return f"Validation error: {e}"
+    try:
+        user = frappe.get_doc({
+            "doctype": "User",
+            "email": email,
+            "first_name": escape_html(full_name),
+            "new_password": password,
+            "enabled": 1,
+            "send_welcome_email": 0,
+        })
+        user.insert(ignore_permissions=True)        
+        frappe.db.commit()
+        return "User registered successfully"
+    except Exception as e:
+        frappe.throw(f"Registration failed: {str(e)}")
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
@@ -119,22 +117,6 @@ def _password_reset_response():
 	return {
 		"message": "If this email is registered, password reset instructions have been sent. Please check your inbox."
 	}
-
-
-def create_blogger_profile(doc, method):
-	frappe.set_user("Administrator")
-	if not frappe.db.exists("Blogger", {"user": doc.name}):
-		blogger = frappe.get_doc(
-			{
-				"doctype": "Blogger",
-				"full_name": doc.full_name,
-				"user": doc.name,
-				"short_name": doc.first_name,
-			}
-		)
-		blogger.insert(ignore_permissions=True)
-		frappe.db.commit()
-
 
 @frappe.whitelist()
 def create_blog_post(title, content, blog_intro, category="Uncategorized", tags=None, backlinks=None):
@@ -281,3 +263,69 @@ def track_traffic(
 	frappe.publish_realtime("blog_traffic_visit", event, after_commit=True)
 
 	return {"name": doc.name}
+
+
+
+#^ handling new user setup to assign Blogger role and create Blogger profile
+import frappe
+
+def handle_new_user_setup(doc, method=None):
+
+    user_roles = frappe.get_roles(doc.name)
+    if "Blogger" not in user_roles:
+        try:
+            doc.add_roles("Blogger")
+        except Exception as e:
+            frappe.log_error(f"Failed to add Blogger role: {e}", "Role Assignment Error")
+    if not frappe.db.exists("Blogger", {"user": doc.name}):
+        try:
+            first_name = doc.first_name or "New"
+            last_name = doc.last_name or "User"
+            full_name = doc.full_name or f"{first_name} {last_name}".strip()
+
+            blogger = frappe.get_doc({
+                "doctype": "Blogger",
+                "full_name": full_name,
+                "user": doc.name,
+                "short_name": doc.first_name or doc.name.split('@')[0],
+            })
+            blogger.insert(ignore_permissions=True)
+            frappe.db.commit() 
+        except Exception:
+            frappe.log_error(frappe.get_traceback(), "Blogger Profile Creation Error")
+
+
+@frappe.whitelist(allow_guest=True)
+def add_to_newsletter(email):
+    if not email or not validate_email_address(email):
+        frappe.throw("Please provide a valid email address")
+
+    group_name = "Newsletter"
+    
+    # Ensure the Email Group exists
+    if not frappe.db.exists("Email Group", group_name):
+        doc = frappe.get_doc({
+            "doctype": "Email Group",
+            "title": group_name
+        })
+        doc.insert(ignore_permissions=True)
+
+    # Check if user is already a member
+    if frappe.db.exists("Email Group Member", {"email": email, "email_group": group_name}):
+        return {"status": "already_subscribed", "message": "You are already subscribed!"}
+
+    # Add new member
+    member = frappe.get_doc({
+        "doctype": "Email Group Member",
+        "email": email,
+        "email_group": group_name
+    })
+    member.insert(ignore_permissions=True)
+    
+    return {"status": "success", "message": "Thank you for subscribing!"}
+
+
+
+@frappe.whitelist()
+def get_current_user_roles():
+	return frappe.get_roles(frappe.session.user)
