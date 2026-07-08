@@ -14,6 +14,7 @@
 						No spam. Curated picks from our editors, straight to you.
 					</p>
 				</div>
+
 				<form @submit.prevent="subscribeNewsletter" class="flex w-full max-w-md flex-col gap-2">
 					<div class="flex w-full gap-2">
 						<input v-model="newsletterEmail" type="email" placeholder="your@email.com" required
@@ -47,24 +48,17 @@
 						Curated articles, creator voices, and practical insight. Stories that
 						matter, from writers who care.
 					</p>
-					<!-- Social links -->
 					<div class="mt-5 flex items-center gap-3">
-						<a href="#" aria-label="Twitter / X" class="social-icon">
+						<a href="#" class="social-icon">
 							<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
 								<path
 									d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.736l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
 							</svg>
 						</a>
-						<a href="#" aria-label="LinkedIn" class="social-icon">
+						<a href="#" class="social-icon">
 							<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
 								<path
 									d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-							</svg>
-						</a>
-						<a href="#" aria-label="RSS Feed" class="social-icon">
-							<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z" />
 							</svg>
 						</a>
 					</div>
@@ -75,9 +69,8 @@
 					<h4 class="mb-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400">Navigate</h4>
 					<nav class="flex flex-col gap-2.5">
 						<router-link to="/" class="footer-link">Home</router-link>
-						<a href="#latest" class="footer-link">Latest Stories</a>
-						<a href="#popular" class="footer-link">Popular</a>
-						<a href="#all-stories" class="footer-link">All Stories</a>
+						<a href="#" class="footer-link">Latest Stories</a>
+						<a href="#" class="footer-link">Popular</a>
 					</nav>
 				</div>
 
@@ -86,7 +79,6 @@
 					<h4 class="mb-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400">Company</h4>
 					<nav class="flex flex-col gap-2.5">
 						<a href="#" class="footer-link">About Us</a>
-						<a href="#" class="footer-link">Write for Us</a>
 						<a href="#" class="footer-link">Privacy Policy</a>
 						<a href="#" class="footer-link">Terms of Use</a>
 					</nav>
@@ -95,19 +87,10 @@
 		</div>
 
 		<!-- Bottom bar -->
-		<div class="border-t border-white/10 py-6">
-			<div
-				class="mx-auto max-w-7xl flex flex-col items-start gap-2 text-xs font-medium text-gray-500 md:flex-row md:items-center md:justify-between">
-				<p>&copy; {{ new Date().getFullYear() }} <a href="#"
-						class="text-gray-400 transition-colors hover:text-white hover:underline">NextNews</a>. All
-					rights reserved.</p>
-				<p class="flex flex-wrap items-center gap-1">
-					<span>Crafted by</span>
-					<a href="#" class="text-gray-400 transition-colors hover:text-white hover:underline">Usman</a>
-					<span class="hidden text-gray-600 md:inline">·</span>
-					<span>Powered by</span>
-					<a href="#" class="text-gray-400 transition-colors hover:text-white hover:underline">NexTash</a>
-				</p>
+		<div class="border-t border-white/10 py-6 text-xs text-gray-500">
+			<div class="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4">
+				<p>&copy; {{ new Date().getFullYear() }} NextNews. All rights reserved.</p>
+				<p>Powered by NexTash</p>
 			</div>
 		</div>
 	</footer>
@@ -137,22 +120,32 @@ const subscribeNewsletter = async () => {
 
 		const result = await response.json();
 
-		if (response.ok) {
-			subscribed.value = true;
-			message.value = result.message || "Subscribed successfully!";
-			messageType.value = "success";
-			newsletterEmail.value = "";
+		if (response.ok && result.message) {
+			const { status, message: apiMessage } = result.message;
 
-			// Reset success state after 5 seconds
+			message.value = apiMessage;
+			messageType.value = "success";
+
+			if (status === "success" || status === "exists") {
+				subscribed.value = status === "success";
+				newsletterEmail.value = "";
+			}
+
+			// Reset UI success state after 5 seconds
 			setTimeout(() => {
 				subscribed.value = false;
 				message.value = "";
 			}, 5000);
+
 		} else {
 			messageType.value = "error";
-			message.value = result._server_messages
-				? JSON.parse(JSON.parse(result._server_messages)[0]).message
-				: "Failed to subscribe.";
+			// Handle Frappe validation/server errors
+			if (result._server_messages) {
+				const errorMsg = JSON.parse(JSON.parse(result._server_messages)[0]).message;
+				message.value = errorMsg;
+			} else {
+				message.value = "Something went wrong.";
+			}
 		}
 	} catch (error) {
 		messageType.value = "error";

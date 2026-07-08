@@ -11,6 +11,9 @@ from frappe.utils.file_manager import save_file
 from frappe.utils.password import get_decrypted_password
 from frappe.www.login import sanitize_redirect
 from frappe.utils import validate_email_address
+from frappe import _
+from frappe.utils.background_jobs import enqueue 
+
 
 
 @frappe.whitelist(allow_guest=True)
@@ -265,10 +268,6 @@ def track_traffic(
 	return {"name": doc.name}
 
 
-
-#^ handling new user setup to assign Blogger role and create Blogger profile
-import frappe
-
 def handle_new_user_setup(doc, method=None):
 
     user_roles = frappe.get_roles(doc.name)
@@ -295,37 +294,92 @@ def handle_new_user_setup(doc, method=None):
             frappe.log_error(frappe.get_traceback(), "Blogger Profile Creation Error")
 
 
-@frappe.whitelist(allow_guest=True)
-def add_to_newsletter(email):
-    if not email or not validate_email_address(email):
-        frappe.throw("Please provide a valid email address")
-
-    group_name = "Newsletter"
-    
-    # Ensure the Email Group exists
-    if not frappe.db.exists("Email Group", group_name):
-        doc = frappe.get_doc({
-            "doctype": "Email Group",
-            "title": group_name
-        })
-        doc.insert(ignore_permissions=True)
-
-    # Check if user is already a member
-    if frappe.db.exists("Email Group Member", {"email": email, "email_group": group_name}):
-        return {"status": "already_subscribed", "message": "You are already subscribed!"}
-
-    # Add new member
-    member = frappe.get_doc({
-        "doctype": "Email Group Member",
-        "email": email,
-        "email_group": group_name
-    })
-    member.insert(ignore_permissions=True)
-    
-    return {"status": "success", "message": "Thank you for subscribing!"}
-
-
-
 @frappe.whitelist()
 def get_current_user_roles():
 	return frappe.get_roles(frappe.session.user)
+
+
+@frappe.whitelist(allow_guest=True)
+def add_to_newsletter(email):
+  
+    if not email or not validate_email_address(email):
+        frappe.throw(_("Please provide a valid email address."))
+    if frappe.db.exists("Subscribers", {"email": email}):
+        return {
+            "status": "exists",
+            "message": _("You are already subscribed to our newsletter!")
+        }
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Subscribers",
+            "email": email,
+        })
+        doc.owner = "Administrator"
+        doc.insert(ignore_permissions=True)
+        return {
+            "status": "success",
+            "message": _("Thank you for subscribing!")
+        }
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), _("Newsletter Subscription Error"))
+        frappe.throw(_("An error occurred while subscribing. Please try again later."))
+
+
+
+
+def notify_subscribers_on_publish(doc, method=None):
+    # 1. Check if it is currently published and we HAVEN'T sent the email yet
+    if doc.published and not doc.get("custom_email_sent_to_subscribers"):
+        
+        # 2. Get previous state safely
+        doc_before_save = doc.get_doc_before_save()
+        was_published = doc_before_save.published if doc_before_save else 0
+        
+        # 3. If it transitioned from unpublished to published
+        if not was_published:
+            enqueue(
+                method="blog.api.send_emails_to_subscribers",
+                queue="long",
+                timeout=1500,
+                blog_name=doc.name
+            )
+            
+            # 4. Update the flag directly in the DB to prevent future duplicate triggers.
+            # db_set bypasses document hooks, which is safer here to avoid infinite loops.
+            doc.db_set("custom_email_sent_to_subscribers", 1, update_modified=False)
+
+
+def send_emails_to_subscribers(blog_name):
+    blog = frappe.get_doc("Blog Post", blog_name)
+    
+    subscribers = frappe.get_all("Subscribers", fields=["email"])
+    recipient_list = [s.email for s in subscribers if s.email]
+
+    if not recipient_list:
+        return
+
+    blog_url = get_url(blog.route)
+    subject = f"New Blog Post: {blog.title}"
+    
+    message = f"""
+        <h3>Hello Subscriber!</h3>
+        <p>A new article has just been published on our blog: <b>{blog.title}</b></p>
+        <p>{blog.blog_intro or ''}</p>
+        <a href="{blog_url}" style="padding: 10px 20px; background-color: #b42318; color: white; text-decoration: none; border-radius: 5px;">
+            Read Full Story
+        </a>
+        <br><br>
+        <p>Best regards,<br>The NextNews Team</p>
+    """
+
+    # Send via Frappe's Email Queue system.
+    # REMOVED: now=True. 
+    # Frappe will now safely generate Email Queue records and process them in chunks.
+    frappe.sendmail(
+        recipients=recipient_list,
+        subject=subject,
+        content=message
+    )
+
+

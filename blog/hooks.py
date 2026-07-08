@@ -11,11 +11,14 @@ app_license = "mit"
 # Apps
 # ------------------
 
-fixtures = [
-    {
-        "doctype": "Social Login Key"
-    },
-]
+# fixtures = [
+#     {
+#         "doctype": "Social Login Key"
+#     },
+#     {
+#         "doctype": "Custom Field"
+#     }
+# ]
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
@@ -157,8 +160,12 @@ doc_events = {
     },
     "User Permission": {
         "after_insert": "blog.api.remove_user_permission"
+    },
+    "Blog Post": {
+        "on_update": "blog.api.notify_subscribers_on_publish"
     }
 }
+
 
 # Scheduled Tasks
 # ---------------
