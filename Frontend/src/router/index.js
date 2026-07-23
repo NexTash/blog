@@ -11,17 +11,17 @@ const routes = [
 		name: "Category",
 		component: () => import("../views/Category.vue"),
 	},
-	{
-		path: "/create-post",
-		name: "CreatePost",
-		component: () => import("../views/CreatePost.vue"),
-		meta: { requiresAuth: true },
-	},
+		{
+			path: "/create-post/:name?",
+			name: "CreatePost",
+			component: () => import("../views/CreatePost.vue"),
+			meta: { requiresAuth: true },
+		},
 	...authRoutes,
 ];
 
 const router = createRouter({
-	history: createWebHistory("/Frontend"),
+	history: createWebHistory("/"),
 	routes,
 });
 

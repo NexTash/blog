@@ -15,6 +15,98 @@ from frappe import _
 from frappe.utils.background_jobs import enqueue 
 
 
+def _require_blogger_for_session_user():
+	blogger_name = frappe.db.get_value("Blogger", {"user": frappe.session.user}, "name")
+	if not blogger_name:
+		frappe.throw("You are not registered as a Blogger.")
+	return blogger_name
+
+
+def _parse_tag_payload(tags):
+	if not tags:
+		return ""
+
+	try:
+		parsed_tags = json.loads(tags) if isinstance(tags, str) else tags
+	except (json.JSONDecodeError, TypeError):
+		parsed_tags = tags
+
+	if isinstance(parsed_tags, str):
+		parsed_tags = parsed_tags.split(",")
+
+	if not isinstance(parsed_tags, list):
+		return ""
+
+	cleaned_tags = []
+	seen_tags = set()
+
+	for tag in parsed_tags:
+		normalized_tag = str(tag or "").strip()
+		if not normalized_tag:
+			continue
+
+		normalized_key = normalized_tag.casefold()
+		if normalized_key in seen_tags:
+			continue
+
+		seen_tags.add(normalized_key)
+		cleaned_tags.append(normalized_tag)
+
+	return ", ".join(cleaned_tags)
+
+
+def _parse_backlinks_payload(backlinks):
+	processed_backlinks = []
+	if backlinks:
+		try:
+			raw_backlinks = json.loads(backlinks) if isinstance(backlinks, str) else backlinks
+			for link in raw_backlinks:
+				if link.get("url"):
+					processed_backlinks.append(
+						{
+							"link_label": (link.get("label") or "").strip(),
+							"link_of_original_source": link.get("url"),
+						}
+					)
+		except Exception as e:
+			frappe.log_error(f"Backlink processing error: {str(e)}")
+	return processed_backlinks
+
+
+def _get_owned_unpublished_post(post_name):
+	blogger_name = _require_blogger_for_session_user()
+	post = frappe.get_doc("Blog Post", post_name)
+	if post.blogger != blogger_name:
+		frappe.throw("You are not allowed to update this story.", frappe.PermissionError)
+	if post.published:
+		frappe.throw("Published stories can only be edited from the backend.")
+	return post
+
+
+def _serialize_post_for_editor(post):
+	return {
+		"name": post.name,
+		"title": post.title,
+		"blog_intro": post.blog_intro or "",
+		"content": post.content or "",
+		"blog_category": post.blog_category,
+		"published": post.published,
+		"published_on": post.published_on,
+		"meta_image": post.meta_image,
+		"route": post.route,
+		"modified": post.modified,
+		"tags": [tag.strip() for tag in (post.custom_tags or "").split(",") if tag.strip()],
+		"backlinks": [
+			{
+				"label": getattr(row, "link_label", "") or "",
+				"url": row.link_of_original_source,
+			}
+			for row in (post.custom_backlinks or [])
+			if row.link_of_original_source
+		],
+	}
+
+
 
 @frappe.whitelist(allow_guest=True)
 def register_user(email, full_name, password):
@@ -109,7 +201,7 @@ def get_google_login_url(redirect_to=None):
 		frappe.throw("Google login is not configured.")
 
 	redirect_to = sanitize_redirect(redirect_to) or get_url(
-		"/Frontend/",
+		"/",
 		allow_header_override=False,
 	)
 
@@ -122,44 +214,83 @@ def _password_reset_response():
 	}
 
 @frappe.whitelist()
-def create_blog_post(title, content, blog_intro, category="Uncategorized", tags=None, backlinks=None):
-	blogger_name = frappe.db.get_value("Blogger", {"user": frappe.session.user}, "name")
-	if not blogger_name:
-		frappe.throw("You are not registered as a Blogger.")
+def create_blog_post(title, content, blog_intro, category="Uncategorized", published=0, tags=None, backlinks=None):
+    user_role = get_current_user_roles()
+    blogger_name = _require_blogger_for_session_user()
+    formatted_tags = _parse_tag_payload(tags)
+    processed_backlinks = _parse_backlinks_payload(backlinks)
 
-	formatted_tags = tags
-	if tags:
-		try:
-			parsed_tags = json.loads(tags)
-			if isinstance(parsed_tags, list):
-				formatted_tags = ", ".join(parsed_tags)
-		except (json.JSONDecodeError, TypeError):
-			pass
+    if "System Manager" in user_role:
+        published = 1
 
-	processed_backlinks = []
-	if backlinks:
-		try:
-			raw_backlinks = json.loads(backlinks)
-			for link in raw_backlinks:
-				if link.get("url"):
-					processed_backlinks.append({"link_of_original_source": link.get("url")})
-		except Exception as e:
-			frappe.log_error(f"Backlink processing error: {str(e)}")
+    doc = frappe.get_doc({
+        "doctype": "Blog Post",
+        "title": title,
+        "blog_intro": blog_intro,
+        "content": content,
+        "content_type": "Rich Text",
+        "blog_category": category,
+        "blogger": blogger_name,
+        "custom_tags": formatted_tags,
+        "custom_backlinks": processed_backlinks,
+        "published": published,
+    })  
+    
+    doc.insert()
 
-	doc = frappe.get_doc(
-		{
-			"doctype": "Blog Post",
-			"title": title,
-			"blog_intro": blog_intro,
-			"content": content,
-			"content_type": "Rich Text",
-			"blog_category": category,
-			"blogger": blogger_name,
-			"tags": formatted_tags,
-			"custom_backlinks": processed_backlinks,
-		}
+    if frappe.request.files and "meta_image" in frappe.request.files:
+        file = frappe.request.files["meta_image"]
+        saved_file = save_file(
+            file.filename,
+            file.stream.read(),
+            "Blog Post",
+            doc.name,
+            is_private=0,
+        )
+        doc.db_set("meta_image", saved_file.file_url)
+
+    status_message = (
+        "Story published successfully." 
+        if doc.published 
+        else "Story saved and is waiting for admin approval."
+    )
+
+    return {
+        "name": doc.name,
+        "message": status_message,
+    }
+
+@frappe.whitelist()
+def get_my_pending_posts():
+	blogger_name = _require_blogger_for_session_user()
+	posts = frappe.get_all(
+		"Blog Post",
+		fields=["name", "title", "modified", "creation", "blog_category", "published", "meta_image"],
+		filters={"published": 0, "blogger": blogger_name},
+		order_by="modified desc, creation desc",
 	)
-	doc.insert()
+	return posts
+
+
+@frappe.whitelist()
+def get_my_pending_post(name):
+	post = _get_owned_unpublished_post(name)
+	return _serialize_post_for_editor(post)
+
+
+@frappe.whitelist()
+def update_my_pending_post(name, title, content, blog_intro, category="Uncategorized", tags=None, backlinks=None):
+	post = _get_owned_unpublished_post(name)
+	post.title = title
+	post.blog_intro = blog_intro
+	post.content = content
+	post.content_type = "Rich Text"
+	post.blog_category = category
+	post.custom_tags = _parse_tag_payload(tags)
+	post.set("custom_backlinks", [])
+	for backlink in _parse_backlinks_payload(backlinks):
+		post.append("custom_backlinks", backlink)
+	post.save(ignore_permissions=True)
 
 	if frappe.request.files and "meta_image" in frappe.request.files:
 		file = frappe.request.files["meta_image"]
@@ -167,12 +298,27 @@ def create_blog_post(title, content, blog_intro, category="Uncategorized", tags=
 			file.filename,
 			file.stream.read(),
 			"Blog Post",
-			doc.name,
+			post.name,
 			is_private=0,
 		)
-		doc.db_set("meta_image", saved_file.file_url)
+		post.db_set("meta_image", saved_file.file_url)
 
-	return doc.name
+	return {
+		"name": post.name,
+		"message": "Pending story updated successfully.",
+		"post": _serialize_post_for_editor(post),
+	}
+
+
+@frappe.whitelist(methods=["POST"])
+def delete_my_pending_post(name):
+	post = _get_owned_unpublished_post(name)
+	post_title = post.title or post.name
+	frappe.delete_doc("Blog Post", post.name, ignore_permissions=True)
+	return {
+		"name": post.name,
+		"message": f'"{post_title}" was deleted successfully.',
+	}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -329,14 +475,11 @@ def add_to_newsletter(email):
 
 
 def notify_subscribers_on_publish(doc, method=None):
-    # 1. Check if it is currently published and we HAVEN'T sent the email yet
+    
     if doc.published and not doc.get("custom_email_sent_to_subscribers"):
-        
-        # 2. Get previous state safely
         doc_before_save = doc.get_doc_before_save()
         was_published = doc_before_save.published if doc_before_save else 0
         
-        # 3. If it transitioned from unpublished to published
         if not was_published:
             enqueue(
                 method="blog.api.send_emails_to_subscribers",
@@ -345,8 +488,6 @@ def notify_subscribers_on_publish(doc, method=None):
                 blog_name=doc.name
             )
             
-            # 4. Update the flag directly in the DB to prevent future duplicate triggers.
-            # db_set bypasses document hooks, which is safer here to avoid infinite loops.
             doc.db_set("custom_email_sent_to_subscribers", 1, update_modified=False)
 
 
@@ -381,5 +522,3 @@ def send_emails_to_subscribers(blog_name):
         subject=subject,
         content=message
     )
-
-

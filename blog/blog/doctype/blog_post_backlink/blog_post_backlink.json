@@ -6,9 +6,16 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "link_label",
   "link_of_original_source"
  ],
  "fields": [
+  {
+   "fieldname": "link_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Link Label"
+  },
   {
    "fieldname": "link_of_original_source",
    "fieldtype": "Data",

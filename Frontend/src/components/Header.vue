@@ -82,6 +82,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, inject, watch } from "vue";
 import { useRouter } from "vue-router";
+import { siteApi } from "../api/siteServices";
 
 const router = useRouter();
 const now = ref(new Date());
@@ -92,22 +93,15 @@ const goToLogin = () => router.push("/login");
 const goToSignup = () => router.push("/signup");
 const goToCreatePost = () => router.push("/create-post");
 const goToBackendPosts = () => {
-	window.location.href = "/app/private/blog-post-";
+	// router.push("/app/nextnews-workspace")
+	window.location.href = "/app/nextnews-workspace";
 };
-
-
 // const isAdministrator = computed(() => {
 // 	const allowedAdmins = ["Administrator", "admin@admin.com"];
 // 	return allowedAdmins.includes(currentUser.value);
 // });
 
 const userRoles = ref([]);
-
-onMounted(async () => {
-	const res = await fetch("/api/method/blog.api.get_current_user_roles");
-	const data = await res.json();
-	userRoles.value = data.message;
-});
 
 const isAdministrator = computed(() => {
 	const allowedRoles = ["System Manager"];
@@ -137,17 +131,28 @@ async function refreshCurrentUser() {
 	}
 
 	try {
-		const response = await fetch("/api/method/frappe.auth.get_logged_user");
-		const data = await response.json();
-		currentUser.value = data?.message || auth?.cookie?.user_id || null;
+		currentUser.value = (await siteApi.getCurrentUser()) || auth?.cookie?.user_id || null;
 	} catch {
 		currentUser.value = auth?.cookie?.user_id || null;
+	}
+}
+
+async function refreshCurrentUserRoles() {
+	if (!auth?.isLoggedIn) {
+		userRoles.value = [];
+		return;
+	}
+	try {
+		userRoles.value = await siteApi.getCurrentUserRoles();
+	} catch {
+		userRoles.value = [];
 	}
 }
 
 let timer;
 onMounted(() => {
 	refreshCurrentUser();
+	refreshCurrentUserRoles();
 	timer = setInterval(() => {
 		now.value = new Date();
 	}, 60000);
@@ -156,6 +161,9 @@ onUnmounted(() => clearInterval(timer));
 
 watch(
 	() => auth?.isLoggedIn,
-	() => refreshCurrentUser(),
+	() => {
+		refreshCurrentUser();
+		refreshCurrentUserRoles();
+	},
 );
 </script>

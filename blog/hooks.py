@@ -68,7 +68,7 @@ app_license = "mit"
 # ----------
 
 # application home page (will override Website Settings)
-home_page = "Frontend"
+# home_page = "Frontend"
 # 
 # website user home page (by Role)
 # role_home_page = {
@@ -270,4 +270,4 @@ doc_events = {
 # ignore_translatable_strings_from = []
 
 
-website_route_rules = [{'from_route': '/Frontend/<path:app_path>', 'to_route': 'Frontend'}, {'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'}, {'from_route': '/Frontend/<path:app_path>', 'to_route': 'Frontend'},]
+website_route_rules = [{'from_route': '/<path:app_path>', 'to_route': 'Frontend'}]

@@ -74,11 +74,43 @@ export const blogApi = {
 		return postForm("blog.api.create_blog_post", formData);
 	},
 
+	getMyPendingPosts() {
+		return request("blog.api.get_my_pending_posts");
+	},
+
+	getMyPendingPost(name) {
+		return request(`blog.api.get_my_pending_post?name=${encodeURIComponent(name)}`);
+	},
+
+	updateMyPendingPost(payload) {
+		const formData = new FormData();
+
+		formData.append("name", payload.name);
+		formData.append("title", payload.title);
+		formData.append("blog_intro", payload.blog_intro);
+		formData.append("content", payload.content);
+		formData.append("category", payload.category);
+		formData.append("tags", JSON.stringify(payload.tags || []));
+		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+
+		if (payload.meta_image) {
+			formData.append("meta_image", payload.meta_image);
+		}
+
+		return postForm("blog.api.update_my_pending_post", formData);
+	},
+
+	deleteMyPendingPost(name) {
+		return postJson("blog.api.delete_my_pending_post", { name });
+	},
+
 	trackTraffic(payload) {
 		return postJson("blog.api.track_traffic", payload);
 	},
 };
 
 export const blogsResource = createCachedResource(() => blogApi.getPosts());
+
 export const categoriesResource = createCachedResource(() => blogApi.getCategories());
+
 export const adsResource = createCachedResource(() => blogApi.getAdvertisements());

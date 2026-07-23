@@ -9,7 +9,8 @@
   "title",
   "link",
   "image",
-  "status"
+  "status",
+  "meta_field"
  ],
  "fields": [
   {
@@ -34,13 +35,18 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Pending\nAccepted\nRejected"
+  },
+  {
+   "fieldname": "meta_field",
+   "fieldtype": "Data",
+   "label": "Meta Field"
   }
  ],
  "grid_page_length": 50,
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-22 18:53:20.230502",
+ "modified": "2026-07-22 14:35:49.241515",
  "modified_by": "Administrator",
  "module": "Blog",
  "name": "Advertisement",

@@ -1,0 +1,111 @@
+{
+  "charts": [
+    {
+      "chart_name": "Daily Log",
+      "label": "Daily Log",
+      "parent": "NextNews Workspace",
+      "parentfield": "charts",
+      "parenttype": "Workspace"
+    }
+  ],
+  "content": "[{\"id\":\"Q9gXDFNa2z\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">NextNews Workspace</span>\",\"col\":12}},{\"id\":\"bLtdC5GPLA\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Daily Log\",\"col\":12}},{\"id\":\"WjxAKetDBf\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 18px; letter-spacing: 0.18px;\\\"><b>Related Doctypes</b></span>\",\"col\":12}},{\"id\":\"-Jecqef8cg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Blog Post\",\"col\":3}},{\"id\":\"JilET2rfm_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Non-Published Blogs\",\"col\":3}},{\"id\":\"wq3n3yBSFw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Blog Category\",\"col\":3}},{\"id\":\"xBwHlw0F5r\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Blogger\",\"col\":3}},{\"id\":\"lUqwoLJfmm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Create New Blog Category\",\"col\":3}},{\"id\":\"ApUmm3338K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Visit Website\",\"col\":3}},{\"id\":\"7iXzCKce7j\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Users</b></span>\",\"col\":12}},{\"id\":\"kMeLeQ62-i\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User List\",\"col\":3}}]",
+  "creation": "2026-07-23 12:46:57.251010",
+  "custom_blocks": [],
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "for_user": "",
+  "hide_custom": 0,
+  "idx": 0,
+  "indicator_color": "green",
+  "is_hidden": 0,
+  "label": "NextNews Workspace",
+  "links": [],
+  "modified": "2026-07-23 12:55:00.000000",
+  "modified_by": "Administrator",
+  "module": "Blog",
+  "name": "NextNews Workspace",
+  "number_cards": [],
+  "owner": "Administrator",
+  "parent_page": "",
+  "public": 1,
+  "quick_lists": [],
+  "roles": [
+    {
+      "role": "System Manager"
+    }
+  ],
+  "sequence_id": 1.0,
+  "shortcuts": [
+    {
+      "color": "Grey",
+      "doc_view": "List",
+      "label": "Blog Category",
+      "link_to": "Blog Category",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "DocType"
+    },
+    {
+      "color": "Grey",
+      "doc_view": "New",
+      "label": "Create New Blog Category",
+      "link_to": "Blog Category",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "DocType"
+    },
+    {
+      "color": "Green",
+      "doc_view": "List",
+      "label": "Blog Post",
+      "link_to": "Blog Post",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "DocType"
+    },
+    {
+      "color": "Red",
+      "doc_view": "List",
+      "label": "Non-Published Blogs",
+      "link_to": "Blog Post",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "stats_filter": "[[\"Blog Post\",\"published\",\"=\",0,false]]",
+      "type": "DocType"
+    },
+    {
+      "color": "Grey",
+      "label": "Visit Website",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "URL",
+      "url": "/"
+    },
+    {
+      "color": "Grey",
+      "doc_view": "List",
+      "label": "Blogger",
+      "link_to": "Blogger",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "DocType"
+    },
+    {
+      "color": "Green",
+      "doc_view": "List",
+      "label": "User List",
+      "link_to": "User",
+      "parent": "NextNews Workspace",
+      "parentfield": "shortcuts",
+      "parenttype": "Workspace",
+      "type": "DocType"
+    }
+  ],
+  "title": "NextNews Workspace"
+}

@@ -98,6 +98,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { siteApi } from "../api/siteServices";
 
 const newsletterEmail = ref("");
 const subscribed = ref(false);
@@ -112,44 +113,23 @@ const subscribeNewsletter = async () => {
 	message.value = "";
 
 	try {
-		const response = await fetch('/api/method/blog.api.add_to_newsletter', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email: newsletterEmail.value })
-		});
+		const result = await siteApi.subscribeNewsletter(newsletterEmail.value.trim());
 
-		const result = await response.json();
+		message.value = result.message;
+		messageType.value = "success";
 
-		if (response.ok && result.message) {
-			const { status, message: apiMessage } = result.message;
-
-			message.value = apiMessage;
-			messageType.value = "success";
-
-			if (status === "success" || status === "exists") {
-				subscribed.value = status === "success";
-				newsletterEmail.value = "";
-			}
-
-			// Reset UI success state after 5 seconds
-			setTimeout(() => {
-				subscribed.value = false;
-				message.value = "";
-			}, 5000);
-
-		} else {
-			messageType.value = "error";
-			// Handle Frappe validation/server errors
-			if (result._server_messages) {
-				const errorMsg = JSON.parse(JSON.parse(result._server_messages)[0]).message;
-				message.value = errorMsg;
-			} else {
-				message.value = "Something went wrong.";
-			}
+		if (result.status === "success" || result.status === "exists") {
+			subscribed.value = result.status === "success";
+			newsletterEmail.value = "";
 		}
+
+		setTimeout(() => {
+			subscribed.value = false;
+			message.value = "";
+		}, 5000);
 	} catch (error) {
 		messageType.value = "error";
-		message.value = "Connection error. Try again later.";
+		message.value = error.message || "Connection error. Try again later.";
 	} finally {
 		loading.value = false;
 	}
