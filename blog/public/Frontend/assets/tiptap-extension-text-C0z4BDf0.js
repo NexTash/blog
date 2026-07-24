@@ -1,0 +1,1 @@
+import{o as e}from"./frappe-te-comp-MediaNodeView-BofQbWXg.js";var t=e.create({name:`text`,group:`inline`,parseMarkdown:e=>({type:`text`,text:e.text||``}),renderMarkdown:e=>e.text||``});export{t};

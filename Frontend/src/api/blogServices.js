@@ -66,6 +66,7 @@ export const blogApi = {
 		formData.append("category", payload.category);
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("status", payload.status || "Submitted for Review");
 
 		if (payload.meta_image) {
 			formData.append("meta_image", payload.meta_image);
@@ -74,8 +75,34 @@ export const blogApi = {
 		return postForm("blog.api.create_blog_post", formData);
 	},
 
+	saveDraft(payload) {
+		const formData = new FormData();
+
+		if (payload.name) {
+			formData.append("name", payload.name);
+		}
+
+		formData.append("title", payload.title || "");
+		formData.append("blog_intro", payload.blog_intro || "");
+		formData.append("content", payload.content || "");
+		formData.append("category", payload.category || "Uncategorized");
+		formData.append("tags", JSON.stringify(payload.tags || []));
+		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("status", payload.status || "Draft");
+
+		if (payload.meta_image) {
+			formData.append("meta_image", payload.meta_image);
+		}
+
+		return postForm("blog.api.save_blog_draft", formData);
+	},
+
 	getMyPendingPosts() {
 		return request("blog.api.get_my_pending_posts");
+	},
+
+	getMyBlogs() {
+		return request("blog.api.get_my_blogs");
 	},
 
 	getMyPendingPost(name) {
@@ -92,6 +119,7 @@ export const blogApi = {
 		formData.append("category", payload.category);
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("status", payload.status || "Submitted for Review");
 
 		if (payload.meta_image) {
 			formData.append("meta_image", payload.meta_image);

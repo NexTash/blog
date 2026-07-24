@@ -1,7 +1,7 @@
 <template>
-	<div
-		class="ad-board-container my-12 p-1 bg-gradient-to-br from-gray-50 to-white rounded-3xl border border-gray-100 shadow-sm"
-	>
+		<div
+			class="ad-board-container my-6 p-1 bg-gradient-to-br from-gray-50 to-white rounded-3xl border border-gray-100 shadow-sm"
+		>
 		<div class="p-6 md:p-8">
 			<!-- Header Section -->
 			<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
@@ -17,9 +17,9 @@
 						<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
 					</h2>
 				</div>
-				<p class="text-gray-500 text-sm max-w-xs">
+				<!-- <p class="text-gray-500 text-sm max-w-xs">
 					Hand-picked resources and tools to help you build better projects.
-				</p>
+				</p> -->
 			</div>
 
 			<!-- Skeleton Loading State -->

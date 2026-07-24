@@ -6,13 +6,13 @@
 			>
 				<div>
 					<p class="kicker">Featured</p>
-					<h2 class="section-heading mt-2">Latest Stories</h2>
+					<h2 class="section-heading mt-2">Latest Blogs</h2>
 				</div>
 				<p class="max-w-lg text-sm leading-6 text-gray-500">
-					Fresh perspectives from the newest published stories.
+					No sales pitch. Just the info you actually need.
 				</p>
 			</div>
-
+<!--  -->
 			<div
 				class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-4 lg:grid-cols-[2fr_1fr_1fr]"
 			>

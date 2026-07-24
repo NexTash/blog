@@ -1,0 +1,1 @@
+import{h as e}from"./-floating-ui-core-Cud118t7.js";var t=[`children`],n=(n,r)=>{if(n===`slot`)return 0;if(n instanceof Function)return n(r);let i=r==null?{}:r,{children:a}=i,o=e(i,t);if(n===`svg`)throw Error(`SVG elements are not supported in the JSX syntax, use the array syntax instead`);return[n,o,a]};export{n as t};

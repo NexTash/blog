@@ -112,20 +112,26 @@ import { getImageUrl, formatDate } from "../utils/post";
 
 const route = useRoute();
 
+const normalizeCategory = (value) => String(value || "").trim().toLowerCase();
+
 onMounted(() => {
 	blogsResource.fetch();
 	categoriesResource.fetch();
 });
 
 const categoryTitle = computed(() => {
-	const cat = (categoriesResource.data || []).find((c) => c.name === route.params.slug);
+	const slug = normalizeCategory(route.params.slug);
+	const cat = (categoriesResource.data || []).find(
+		(category) => normalizeCategory(category.name) === slug,
+	);
 	return cat ? cat.title || cat.name : route.params.slug;
 });
 
 const loading = computed(() => blogsResource.loading);
 
 const posts = computed(() => {
+	const slug = normalizeCategory(route.params.slug);
 	const all = blogsResource.data || [];
-	return all.filter((p) => p.blog_category === route.params.slug);
+	return all.filter((post) => normalizeCategory(post.blog_category) === slug);
 });
 </script>

@@ -11,7 +11,7 @@
 				</div>
 
 				<span class="whitespace-nowrap text-sm font-black uppercase tracking-tight">
-					Top Stories
+					Just In
 				</span>
 			</div>
 

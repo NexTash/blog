@@ -22,6 +22,62 @@ def _require_blogger_for_session_user():
 	return blogger_name
 
 
+def _get_blogger_for_session_user():
+	return frappe.db.get_value(
+		"Blogger",
+		{"user": frappe.session.user},
+		["name", "full_name", "short_name", "bio", "avatar"],
+		as_dict=True,
+	)
+
+
+DRAFT_STATUS = "Draft"
+REVIEW_STATUS = "Submitted for Review"
+PUBLISHED_STATUS = "Published"
+REJECTED_STATUS = "Rejected"
+
+
+def _normalize_post_status(status=None, published=0, fallback=DRAFT_STATUS):
+	if published:
+		return PUBLISHED_STATUS
+
+	normalized_status = str(status or "").strip()
+	if normalized_status in {DRAFT_STATUS, REVIEW_STATUS, PUBLISHED_STATUS, REJECTED_STATUS}:
+		return normalized_status
+
+	return fallback
+
+
+def _blog_post_has_status_field():
+	return frappe.get_meta("Blog Post").has_field("custom_post_status")
+
+
+def _blog_post_list_fields(*extra_fields):
+	fields = list(extra_fields)
+	if _blog_post_has_status_field():
+		fields.append("custom_post_status")
+	return fields
+
+
+def _set_post_status(target, status):
+	if not _blog_post_has_status_field():
+		return
+
+	if isinstance(target, dict):
+		target["custom_post_status"] = status
+		return
+
+	target.custom_post_status = status
+
+
+def _get_post_status(post, fallback=DRAFT_STATUS):
+	return _normalize_post_status(
+		getattr(post, "custom_post_status", None),
+		published=getattr(post, "published", 0),
+		fallback=fallback,
+	)
+
+
 def _parse_tag_payload(tags):
 	if not tags:
 		return ""
@@ -73,6 +129,40 @@ def _parse_backlinks_payload(backlinks):
 	return processed_backlinks
 
 
+def _ensure_blog_category_route(category_name):
+	if not category_name:
+		return "blog/uncategorized"
+
+	route = frappe.db.get_value("Blog Category", category_name, "route")
+	if route:
+		return route.strip("/")
+
+	category = frappe.get_doc("Blog Category", category_name)
+	category.set_route()
+	category_route = (category.route or "").strip("/")
+
+	if not category_route:
+		category_route = f"blog/{frappe.scrub(category.title or category.name or 'uncategorized')}"
+
+	category.db_set("route", category_route, update_modified=False)
+	return category_route
+
+
+def _build_blog_post_route(title, category_name):
+	category_route = _ensure_blog_category_route(category_name)
+	title_slug = frappe.scrub(title or "untitled")
+	return f"{category_route}/{title_slug}".strip("/")
+
+
+def _resolve_draft_title(title, existing_title=None):
+	resolved_title = (title or "").strip()
+	if resolved_title:
+		return resolved_title
+	if existing_title:
+		return existing_title
+	return f"Untitled Draft {now_datetime().strftime('%Y-%m-%d %H:%M')}"
+
+
 def _get_owned_unpublished_post(post_name):
 	blogger_name = _require_blogger_for_session_user()
 	post = frappe.get_doc("Blog Post", post_name)
@@ -91,6 +181,7 @@ def _serialize_post_for_editor(post):
 		"content": post.content or "",
 		"blog_category": post.blog_category,
 		"published": post.published,
+		"custom_post_status": _get_post_status(post, fallback=DRAFT_STATUS),
 		"published_on": post.published_on,
 		"meta_image": post.meta_image,
 		"route": post.route,
@@ -214,7 +305,7 @@ def _password_reset_response():
 	}
 
 @frappe.whitelist()
-def create_blog_post(title, content, blog_intro, category="Uncategorized", published=0, tags=None, backlinks=None):
+def create_blog_post(title, content, blog_intro, category="Uncategorized", published=0, tags=None, backlinks=None, status=None):
     user_role = get_current_user_roles()
     blogger_name = _require_blogger_for_session_user()
     formatted_tags = _parse_tag_payload(tags)
@@ -223,7 +314,13 @@ def create_blog_post(title, content, blog_intro, category="Uncategorized", publi
     if "System Manager" in user_role:
         published = 1
 
-    doc = frappe.get_doc({
+    resolved_status = _normalize_post_status(
+        status,
+        published=published,
+        fallback=REVIEW_STATUS,
+    )
+
+    post_values = {
         "doctype": "Blog Post",
         "title": title,
         "blog_intro": blog_intro,
@@ -234,7 +331,10 @@ def create_blog_post(title, content, blog_intro, category="Uncategorized", publi
         "custom_tags": formatted_tags,
         "custom_backlinks": processed_backlinks,
         "published": published,
-    })  
+        "route": _build_blog_post_route(title, category),
+    }
+    _set_post_status(post_values, resolved_status)
+    doc = frappe.get_doc(post_values)  
     
     doc.insert()
 
@@ -252,7 +352,7 @@ def create_blog_post(title, content, blog_intro, category="Uncategorized", publi
     status_message = (
         "Story published successfully." 
         if doc.published 
-        else "Story saved and is waiting for admin approval."
+        else "Story submitted for review successfully."
     )
 
     return {
@@ -265,7 +365,20 @@ def get_my_pending_posts():
 	blogger_name = _require_blogger_for_session_user()
 	posts = frappe.get_all(
 		"Blog Post",
-		fields=["name", "title", "modified", "creation", "blog_category", "published", "meta_image"],
+		fields=[
+			"name",
+			"title",
+			"modified",
+			"creation",
+			"blog_category",
+			"published",
+			"meta_image",
+			*(
+				["custom_post_status"]
+				if _blog_post_has_status_field()
+				else []
+			),
+		],
 		filters={"published": 0, "blogger": blogger_name},
 		order_by="modified desc, creation desc",
 	)
@@ -279,13 +392,22 @@ def get_my_pending_post(name):
 
 
 @frappe.whitelist()
-def update_my_pending_post(name, title, content, blog_intro, category="Uncategorized", tags=None, backlinks=None):
+def update_my_pending_post(name, title, content, blog_intro, category="Uncategorized", tags=None, backlinks=None, status=None):
 	post = _get_owned_unpublished_post(name)
 	post.title = title
 	post.blog_intro = blog_intro
 	post.content = content
 	post.content_type = "Rich Text"
 	post.blog_category = category
+	post.route = _build_blog_post_route(title, category)
+	_set_post_status(
+		post,
+		_normalize_post_status(
+			status,
+			published=post.published,
+			fallback=REVIEW_STATUS,
+		),
+	)
 	post.custom_tags = _parse_tag_payload(tags)
 	post.set("custom_backlinks", [])
 	for backlink in _parse_backlinks_payload(backlinks):
@@ -305,7 +427,68 @@ def update_my_pending_post(name, title, content, blog_intro, category="Uncategor
 
 	return {
 		"name": post.name,
-		"message": "Pending story updated successfully.",
+		"message": (
+			"Story published successfully."
+			if _get_post_status(post) == PUBLISHED_STATUS
+			else "Story submitted for review successfully."
+			if _get_post_status(post) == REVIEW_STATUS
+			else "Draft updated successfully."
+		),
+		"post": _serialize_post_for_editor(post),
+	}
+
+
+@frappe.whitelist()
+def save_blog_draft(name=None, title=None, content=None, blog_intro=None, category="Uncategorized", tags=None, backlinks=None):
+	blogger_name = _require_blogger_for_session_user()
+	resolved_title = _resolve_draft_title(title)
+
+	if name:
+		post = _get_owned_unpublished_post(name)
+		post.title = _resolve_draft_title(title, post.title)
+		post.blog_intro = blog_intro or ""
+		post.content = content or ""
+		post.content_type = "Rich Text"
+		post.blog_category = category or "Uncategorized"
+		_set_post_status(post, DRAFT_STATUS)
+		post.route = _build_blog_post_route(post.title, post.blog_category)
+		post.custom_tags = _parse_tag_payload(tags)
+		post.set("custom_backlinks", [])
+		for backlink in _parse_backlinks_payload(backlinks):
+			post.append("custom_backlinks", backlink)
+		post.save(ignore_permissions=True)
+	else:
+		post_values = {
+				"doctype": "Blog Post",
+				"title": resolved_title,
+				"blog_intro": blog_intro or "",
+				"content": content or "",
+				"content_type": "Rich Text",
+				"blog_category": category or "Uncategorized",
+				"blogger": blogger_name,
+				"custom_tags": _parse_tag_payload(tags),
+				"custom_backlinks": _parse_backlinks_payload(backlinks),
+				"published": 0,
+				"route": _build_blog_post_route(resolved_title, category or "Uncategorized"),
+			}
+		_set_post_status(post_values, DRAFT_STATUS)
+		post = frappe.get_doc(post_values)
+		post.insert()
+
+	if frappe.request.files and "meta_image" in frappe.request.files:
+		file = frappe.request.files["meta_image"]
+		saved_file = save_file(
+			file.filename,
+			file.stream.read(),
+			"Blog Post",
+			post.name,
+			is_private=0,
+		)
+		post.db_set("meta_image", saved_file.file_url)
+
+	return {
+		"name": post.name,
+		"message": "Draft saved successfully.",
 		"post": _serialize_post_for_editor(post),
 	}
 
@@ -443,6 +626,126 @@ def handle_new_user_setup(doc, method=None):
 @frappe.whitelist()
 def get_current_user_roles():
 	return frappe.get_roles(frappe.session.user)
+
+
+@frappe.whitelist()
+def get_current_user_profile():
+	if frappe.session.user == "Guest":
+		frappe.throw("Please log in to view your profile.", frappe.PermissionError)
+
+	user_id = frappe.session.user
+	user_details = frappe.db.get_value(
+		"User",
+		user_id,
+		["name", "full_name", "first_name", "user_image", "enabled"],
+		as_dict=True,
+	) or {}
+	blogger = _get_blogger_for_session_user() or {}
+	blogger_name = blogger.get("name")
+
+	total_posts = frappe.db.count("Blog Post", {"blogger": blogger_name}) if blogger_name else 0
+	published_posts = (
+		frappe.db.count("Blog Post", {"blogger": blogger_name, "published": 1})
+		if blogger_name
+		else 0
+	)
+	has_status_field = _blog_post_has_status_field()
+	draft_posts = 0
+	review_posts = 0
+	if blogger_name and has_status_field:
+		draft_posts = frappe.db.count(
+			"Blog Post",
+			{"blogger": blogger_name, "custom_post_status": DRAFT_STATUS},
+		)
+		review_posts = frappe.db.count(
+			"Blog Post",
+			{"blogger": blogger_name, "custom_post_status": REVIEW_STATUS},
+		)
+	elif blogger_name:
+		draft_posts = frappe.db.count("Blog Post", {"blogger": blogger_name, "published": 0})
+
+	recent_posts = (
+		frappe.get_all(
+			"Blog Post",
+			fields=_blog_post_list_fields(
+				"name",
+				"title",
+				"blog_intro",
+				"blog_category",
+				"published",
+				"published_on",
+				"modified",
+				"meta_image",
+				"route",
+			),
+			filters={"blogger": blogger_name},
+			order_by="modified desc, creation desc",
+			limit=3,
+		)
+		if blogger_name
+		else []
+	)
+
+	display_name = (
+		blogger.get("full_name")
+		or user_details.get("full_name")
+		or user_details.get("first_name")
+		or user_id.split("@")[0]
+	)
+
+	return {
+		"user": {
+			"email": user_id,
+			"full_name": user_details.get("full_name") or "",
+			"first_name": user_details.get("first_name") or "",
+			"user_image": user_details.get("user_image") or "",
+			"enabled": user_details.get("enabled"),
+		},
+		"blogger": {
+			"name": blogger_name,
+			"full_name": blogger.get("full_name") or "",
+			"short_name": blogger.get("short_name") or "",
+			"bio": blogger.get("bio") or "",
+			"avatar": blogger.get("avatar") or "",
+		},
+		"display_name": display_name,
+		"roles": frappe.get_roles(user_id),
+		"stats": {
+			"total_posts": total_posts,
+			"published_posts": published_posts,
+			"draft_posts": draft_posts,
+			"review_posts": review_posts,
+		},
+		"recent_posts": recent_posts,
+	}
+
+
+@frappe.whitelist()
+def get_my_blogs():
+	if frappe.session.user == "Guest":
+		frappe.throw("Please log in to view your stories.", frappe.PermissionError)
+
+	blogger = _get_blogger_for_session_user()
+	if not blogger:
+		return []
+
+	return frappe.get_all(
+		"Blog Post",
+		fields=_blog_post_list_fields(
+			"name",
+			"title",
+			"blog_intro",
+			"blog_category",
+			"published",
+			"published_on",
+			"modified",
+			"creation",
+			"meta_image",
+			"route",
+		),
+		filters={"blogger": blogger.get("name")},
+		order_by="published desc, modified desc, creation desc",
+	)
 
 
 @frappe.whitelist(allow_guest=True)

@@ -1,6 +1,6 @@
 <template>
 	<main class="bg-[#f6f3ee]">
-		<section class="px-4 py-10">
+		<section class="px-4 pt-10 pb-6">
 			<div class="mx-auto max-w-7xl">
 				<div class="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
 					<div>
@@ -36,7 +36,7 @@
 			</div>
 		</section>
 
-		<section class="bg-white px-4 py-12">
+		<section class="bg-white px-4 pt-6 pb-12">
 			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				<div v-for="i in 6" :key="i" class="surface overflow-hidden">
 					<div class="skeleton h-56 rounded-none"></div>

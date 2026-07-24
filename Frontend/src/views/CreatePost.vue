@@ -13,7 +13,7 @@
                                 d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
-                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-black mb-4">{{ successTitle }}</h2>
+                    <h2 class="editorial-display text-3xl md:text-4xl font-bold text-black mb-4">{{ successTitle }}</h2>
                     <p class="text-base text-gray-600 mb-10 leading-relaxed">{{ submissionMessage }}</p>
                     <div class="space-y-4">
                         <router-link to="/"
@@ -40,7 +40,7 @@
                             <span class="text-black">{{ isEditing ? "Edit Story" : "New Story" }}</span>
                         </nav>
                         <div class="flex items-center gap-4">
-                            <h1 class="text-3xl md:text-4xl font-serif font-bold tracking-tight text-black">
+                            <h1 class="editorial-display text-3xl md:text-4xl font-bold tracking-tight text-black">
                                 {{ headerTitle }}
                             </h1>
                             <span v-if="isSystemManager"
@@ -115,31 +115,19 @@
                                         Title</label>
                                     <input id="story-title" v-model="form.title" type="text"
                                         placeholder="Enter an engaging title..."
-                                        class="w-full border-none p-0 font-serif text-4xl font-bold placeholder-gray-300 focus:ring-0 outline-none"
+                                        class="editorial-display w-full border-none p-0 text-4xl font-bold placeholder-gray-300 focus:ring-0 outline-none"
                                         required />
                                 </div>
 
                                 <!-- Content Body -->
-                                <div
-                                    class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-black transition-shadow">
-                                    <div
-                                        class="border-b border-gray-100 bg-gray-50/80 px-8 py-4 flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-gray-600">
-                                        <label for="story-content">Article Body</label>
-                                        <span class="bg-black text-white px-3 py-1 rounded-md shadow-sm">{{ wordCount }}
-                                            Words</span>
-                                    </div>
-                                    <textarea id="story-content" v-model="form.content" rows="18"
-                                        placeholder="Start writing your story here..."
-                                        class="w-full border-none p-8 font-mono text-[15px] leading-relaxed placeholder-gray-300 focus:ring-0 outline-none resize-y"
-                                        required></textarea>
-                                </div>
+                                <PostBodyEditor v-model="form.content" :word-count="wordCount" />
 
                                 <!-- Intro/Summary -->
                                 <div
                                     class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-black transition-shadow">
                                     <label for="story-summary"
-                                        class="mb-4 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">SEO
-                                        / Short Summary</label>
+                                        class="mb-4 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">Short
+                                        Summary</label>
                                     <textarea id="story-summary" v-model="form.blog_intro" rows="3"
                                         placeholder="A brief hook or meta description..."
                                         class="w-full border-none p-0 text-lg italic text-gray-600 placeholder-gray-300 focus:ring-0 outline-none resize-none"></textarea>
@@ -164,9 +152,10 @@
                                     </div>
 
                                     <div class="flex flex-col gap-3">
-                                        <button type="submit" :disabled="loading || !isFormValid"
+                                        <button ref="publishButton" type="submit"
+                                            :disabled="isSavingDraft || isSubmitting || !isFormValid"
                                             class="w-full rounded-xl bg-white py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98]">
-                                            <span v-if="loading" class="flex items-center justify-center gap-2">
+                                            <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
                                                 <svg class="animate-spin h-4 w-4 text-black"
                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle class="opacity-25" cx="12" cy="12" r="10"
@@ -183,9 +172,15 @@
 
                                         <!-- LOCAL SAVE BUTTON: Only visible if not a system manager -->
                                         <button v-if="!isSystemManager" type="button" @click="saveToLocal"
-                                            class="w-full rounded-xl border border-gray-700 bg-transparent py-3 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-white transition-all">
-                                            Save Progress 
+                                            :disabled="isSavingDraft || isSubmitting"
+                                            class="w-full rounded-xl border border-gray-700 bg-transparent py-3 text-[10px] uppercase tracking-widest text-black bg-white transition-all">
+                                            <span v-if="isSavingDraft">Saving Draft...</span>
+                                            <span v-else>Save Progress</span>
                                         </button>
+                                        <p v-if="localSaveMessage"
+                                            class="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                                            {{ localSaveMessage }}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -225,6 +220,47 @@
                                             #{{ tag }}
                                             <span class="opacity-50 group-hover:opacity-100">×</span>
                                         </span>
+                                    </div>
+                                </div>
+
+                                <!-- Sources & Links -->
+                                <div class="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
+                                    <div class="mb-4 flex items-center justify-between gap-3">
+                                        <label
+                                            class="block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">Links</label>
+                                        <button type="button" @click="addBacklink"
+                                            class="rounded-lg bg-gray-100 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-gray-700 transition-colors hover:bg-black hover:text-white">
+                                            Add Link
+                                        </button>
+                                    </div>
+
+                                    <div v-if="!form.backlinks.length"
+                                        class="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-xs text-gray-500">
+                                        Add source or reference links that should appear with the article.
+                                    </div>
+
+                                    <div v-else class="space-y-4">
+                                        <div v-for="(backlink, index) in form.backlinks" :key="index"
+                                            class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                            <div class="mb-3 flex items-center justify-between gap-3">
+                                                <p
+                                                    class="text-[11px] font-black uppercase tracking-[0.14em] text-gray-500">
+                                                    Link {{ index + 1 }}
+                                                </p>
+                                                <button type="button" @click="removeBacklink(index)"
+                                                    class="text-[10px] font-black uppercase tracking-widest text-red-600 transition-colors hover:text-red-800">
+                                                    Remove
+                                                </button>
+                                            </div>
+                                            <div class="space-y-3">
+                                                <input v-model="backlink.label" type="text"
+                                                    placeholder="Label (optional)"
+                                                    class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-black focus:ring-1 focus:ring-black" />
+                                                <input v-model="backlink.url" type="url"
+                                                    placeholder="https://example.com/source"
+                                                    class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-black focus:ring-1 focus:ring-black" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -275,27 +311,68 @@
                 </div>
 
                 <!-- PREVIEW TAB -->
-                <div v-show="activeTab === 'preview'" class="mx-auto max-w-3xl fade-in pb-20">
-                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
-                        <div v-if="imagePreview" class="h-80 md:h-[28rem] w-full overflow-hidden">
-                            <img :src="imagePreview" alt="Preview cover"
-                                class="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
-                        </div>
-                        <div class="px-8 md:px-16 py-12">
-                            <div class="mb-6 flex gap-2">
-                                <span v-if="form.category"
-                                    class="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{{
-                                    form.category }}</span>
+                <div v-show="activeTab === 'preview'" class="fade-in pb-20">
+                    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl">
+                        <div class="border-b border-gray-200 bg-[#f6f3ee] px-4 py-3">
+                            <div class="mx-auto max-w-4xl">
+                                <nav class="flex items-center gap-2 text-sm font-bold" aria-label="Preview Breadcrumb">
+                                    <span class="text-[#b42318]">Home</span>
+                                    <span class="text-gray-500" aria-hidden="true"> > </span>
+                                    <span class="truncate text-[#b42318]">{{ form.title || "Untitled Story" }}</span>
+                                </nav>
                             </div>
-                            <h1
-                                class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight text-gray-900">
-                                {{
-                                    form.title || "Untitled Story" }}</h1>
-                            <div v-if="form.blog_intro"
-                                class="mb-10 text-xl font-serif text-gray-600 italic border-l-4 border-black pl-6 py-2 bg-gray-50/50 rounded-r-lg">
-                                {{ form.blog_intro }}</div>
-                            <div class="preview-content-area prose prose-lg max-w-none prose-p:text-gray-700 prose-headings:font-serif prose-headings:text-black prose-a:text-blue-600"
-                                v-html="previewContent"></div>
+                        </div>
+
+                        <div class="mx-auto max-w-4xl px-4 py-10 md:px-6 md:py-14">
+                            <article class="preview-shell">
+                                <span v-if="form.category" class="kicker">
+                                    {{ form.category }}
+                                </span>
+                                <span v-else class="kicker">Uncategorized</span>
+
+                                <h1
+                                    class="mt-4 text-4xl font-black leading-tight tracking-tight text-gray-900 md:text-5xl">
+                                    {{ form.title || "Untitled Story" }}
+                                </h1>
+
+                                <div
+                                    class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold uppercase tracking-[0.14em] text-gray-400">
+                                    <span>{{
+                                        formatDate(new Date().toISOString(), {
+                                            month: "long",
+                                            day: "numeric",
+                                            year: "numeric",
+                                        })
+                                        }}</span>
+                                    <span aria-hidden="true" class="text-gray-300">|</span>
+                                    <span>Preview Author</span>
+                                </div>
+
+                                <div
+                                    class="my-10 overflow-hidden rounded-lg bg-gray-100 shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
+                                    <img :src="imagePreview || getImageUrl('')"
+                                        :alt="form.title || 'Preview cover image'"
+                                        class="max-h-[520px] w-full object-cover" />
+                                </div>
+
+                                <p v-if="form.blog_intro"
+                                    class="bg-[#FFF44F] py-4 pl-5 pr-4 text-xl leading-8 text-gray-800 md:text-2xl">
+                                    {{ form.blog_intro }}
+                                </p>
+
+                                <hr v-if="form.blog_intro" class="my-10 border-gray-200" />
+
+                                <div class="article-content" v-html="previewContent"></div>
+
+                                <div class="mt-12 border-t border-gray-200 pt-8">
+                                    <h2 class="text-lg font-bold text-gray-900">Disclosure Policy</h2>
+                                    <p class="text-sm text-gray-500">
+                                        This post may contain links to partner services. We may receive compensation if
+                                        you use these
+                                        services, at no extra cost to you.
+                                    </p>
+                                </div>
+                            </article>
                         </div>
                     </div>
                 </div>
@@ -305,17 +382,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { blogApi } from "../api/blogServices.js";
-import { formatDate, getImageUrl, sanitizeHtml } from "../utils/post";
-
-// Constants
-const LOCAL_STORAGE_KEY = "blogger_draft_progress";
+import { formatDate, getImageUrl, sanitizeHtml, stripHtml } from "../utils/post";
 
 // Hooks & Routing
 const route = useRoute();
 const router = useRouter();
+const PostBodyEditor = defineAsyncComponent(() => import("../components/PostBodyEditor.vue"));
 
 // Auth Mock
 const authState = reactive({ user: { role: 'Author' } });
@@ -323,6 +398,8 @@ const isSystemManager = computed(() => authState.user.role === 'System Manager')
 
 // Component State
 const loading = ref(false);
+const isSavingDraft = ref(false);
+const isSubmitting = ref(false);
 const error = ref("");
 const isSubmitted = ref(false);
 const submissionMessage = ref("");
@@ -339,6 +416,9 @@ const imagePreview = ref(null);
 const imageFile = ref(null);
 const imageInput = ref(null);
 const isDragOver = ref(false);
+const publishButton = ref(null);
+const localSaveMessage = ref("");
+const objectPreviewUrl = ref("");
 
 // Form State
 const tagInput = ref("");
@@ -348,14 +428,16 @@ const form = reactive({
     content: "",
     category: "",
     tags: [],
+    backlinks: [],
 });
 
 // Computed
 const editingPostName = computed(() => route.params.name || "");
 const isEditing = computed(() => !!editingPostName.value);
 const successTitle = computed(() => isEditing.value ? "Story Updated!" : "Story Submitted!");
-const isFormValid = computed(() => form.title.length > 5 && form.content.length > 10);
-const wordCount = computed(() => form.content.split(/\s+/).filter(Boolean).length);
+const plainContent = computed(() => stripHtml(form.content));
+const isFormValid = computed(() => form.title.trim().length > 5 && plainContent.value.length > 10);
+const wordCount = computed(() => plainContent.value.split(/\s+/).filter(Boolean).length);
 const previewContent = computed(() => sanitizeHtml(form.content));
 
 const headerTitle = computed(() => {
@@ -363,71 +445,103 @@ const headerTitle = computed(() => {
     return "Create New Story";
 });
 
-const sidebarListTitle = computed(() => isSystemManager.value ? "System Database" : "Your Pending Drafts");
+const sidebarListTitle = computed(() => isSystemManager.value ? "System Database" : "Your Unpublished Stories");
 
 const submitButtonLabel = computed(() => {
     if (isEditing.value) return "Update Changes";
     return isSystemManager.value ? "Publish Immediately" : "Submit for Review";
 });
 
-// --- Local Storage Logic ---
+const saveToLocal = async () => {
+    try {
+        isSavingDraft.value = true;
+        const payload = buildSubmitPayload();
+        const response = await blogApi.saveDraft({
+            name: editingPostName.value || undefined,
+            ...payload,
+            status: "Draft",
+        });
 
-const saveToLocal = () => {
-    const data = {
-        title: form.title,
-        blog_intro: form.blog_intro,
-        content: form.content,
-        category: form.category,
-        tags: [...form.tags],
-        savedAt: new Date().toISOString()
-    };
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+        localSaveMessage.value = response.message || "Draft saved successfully.";
+        await fetchPendingPosts();
 
-    alert("Your Blog Saved Successfully!");
-};
-
-const loadLocalDraft = () => {
-    // Only load if NOT editing an existing API post
-    if (isEditing.value) return;
-
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-        try {
-            const draft = JSON.parse(saved);
-            form.title = draft.title || "";
-            form.blog_intro = draft.blog_intro || "";
-            form.content = draft.content || "";
-            form.category = draft.category || "";
-            form.tags = Array.isArray(draft.tags) ? draft.tags : [];
-            console.log("Draft restored from local storage.");
-        } catch (e) {
-            console.error("Failed to restore local draft", e);
+        if (!editingPostName.value && response.name) {
+            await router.replace({ name: "CreatePost", params: { name: response.name } });
         }
-    }
-};
 
-const clearLocalDraft = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
+        error.value = "";
+    } catch (e) {
+        console.error("Failed to save draft", e);
+        error.value = e.message || "Unable to save draft.";
+        localSaveMessage.value = "";
+    } finally {
+        isSavingDraft.value = false;
+    }
 };
 
 // --- Core Functions ---
 
+function revokeObjectPreviewUrl() {
+    if (objectPreviewUrl.value) {
+        URL.revokeObjectURL(objectPreviewUrl.value);
+        objectPreviewUrl.value = "";
+    }
+}
+
+function setImagePreview(url) {
+    revokeObjectPreviewUrl();
+    imagePreview.value = url;
+}
+
+function setImageFromFile(file) {
+    imageFile.value = file;
+    revokeObjectPreviewUrl();
+    objectPreviewUrl.value = URL.createObjectURL(file);
+    imagePreview.value = objectPreviewUrl.value;
+}
+
+function buildSubmitPayload() {
+    return {
+        title: form.title.trim(),
+        blog_intro: form.blog_intro.trim(),
+        content: form.content,
+        category: form.category,
+        tags: [...form.tags],
+        backlinks: form.backlinks
+            .map((backlink) => ({
+                label: String(backlink?.label || "").trim(),
+                url: String(backlink?.url || "").trim(),
+            }))
+            .filter((backlink) => backlink.url),
+        meta_image: imageFile.value,
+    };
+}
+
 function applyPostToForm(post) {
     if (!post) return;
+    imageFile.value = null;
     form.title = post.title || "";
     form.blog_intro = post.blog_intro || "";
     form.content = post.content || "";
     form.category = post.blog_category || "";
     form.tags = Array.isArray(post.tags) ? [...post.tags] : [];
-    imagePreview.value = post.meta_image ? getImageUrl(post.meta_image) : null;
+    form.backlinks = Array.isArray(post.backlinks)
+        ? post.backlinks.map((backlink) => ({
+            label: backlink?.label || "",
+            url: backlink?.url || "",
+        }))
+        : [];
+    setImagePreview(post.meta_image ? getImageUrl(post.meta_image) : null);
+    localSaveMessage.value = "";
 }
 
 function resetComposerState() {
     Object.assign(form, {
-        title: "", blog_intro: "", content: "", category: categories.value[0]?.name || "", tags: []
+        title: "", blog_intro: "", content: "", category: categories.value[0]?.name || "", tags: [], backlinks: []
     });
     clearImage();
     error.value = "";
+    localSaveMessage.value = "";
     activeTab.value = "write";
 }
 
@@ -478,7 +592,6 @@ watch(
         if (newName) await loadPostData(newName);
         else {
             resetComposerState();
-            loadLocalDraft();
         }
     },
     { immediate: true }
@@ -487,13 +600,16 @@ watch(
 // Handlers
 const processFile = (file) => {
     if (file && file.type.startsWith("image/")) {
-        imageFile.value = file;
-        imagePreview.value = URL.createObjectURL(file);
+        setImageFromFile(file);
     }
 };
 const handleImageDrop = (e) => { isDragOver.value = false; processFile(e.dataTransfer?.files?.[0]); };
 const handleImageSelect = (e) => processFile(e.target.files?.[0]);
-const clearImage = () => { imagePreview.value = null; imageFile.value = null; };
+const clearImage = () => {
+    revokeObjectPreviewUrl();
+    imagePreview.value = null;
+    imageFile.value = null;
+};
 const openImagePicker = () => imageInput.value?.click();
 const addTag = () => {
     const rawTag = tagInput.value.trim().toLowerCase();
@@ -501,6 +617,8 @@ const addTag = () => {
     tagInput.value = "";
 };
 const removeTag = (index) => form.tags.splice(index, 1);
+const addBacklink = () => form.backlinks.push({ label: "", url: "" });
+const removeBacklink = (index) => form.backlinks.splice(index, 1);
 
 // Mutations
 const deletePendingPost = async (post) => {
@@ -517,42 +635,57 @@ const deletePendingPost = async (post) => {
     }
 };
 
-const handleSubmit = async () => {
+const handleSubmit = async (event) => {
+    if (event?.submitter && event.submitter !== publishButton.value) {
+        return;
+    }
+
     if (!isFormValid.value) return;
+    error.value = "";
     loading.value = true;
+    isSubmitting.value = true;
     try {
-        const payload = { ...form, meta_image: imageFile.value };
-        let res = isEditing.value
-            ? await blogApi.updateMyPendingPost({ name: editingPostName.value, ...payload })
-            : await blogApi.createPost(payload);
+        const payload = buildSubmitPayload();
+        const res = isEditing.value
+            ? await blogApi.updateMyPendingPost({
+                name: editingPostName.value,
+                ...payload,
+                status: isSystemManager.value ? "Published" : "Submitted for Review",
+            })
+            : await blogApi.createPost({
+                ...payload,
+                status: isSystemManager.value ? "Published" : "Submitted for Review",
+            });
 
         submissionMessage.value = res.message || "Saved successfully.";
         isSubmitted.value = true;
 
-        // Clear local storage because the post is now in the database
-        clearLocalDraft();
         await fetchPendingPosts();
     } catch (e) {
-        error.value = e.message || "Submission error.";
+        const baseMessage = e.message || "Submission error.";
+        error.value = `${baseMessage} You can still use Save Progress to keep this draft in the backend.`;
     } finally {
         loading.value = false;
+        isSubmitting.value = false;
     }
 };
 
 onMounted(async () => {
-    try { categories.value = await blogApi.getCategories(); } catch (e) { }
+    try {
+        categories.value = await blogApi.getCategories();
+        if (!isEditing.value && !form.category && categories.value.length) {
+            form.category = categories.value[0].name;
+        }
+    } catch (e) { }
     await fetchPendingPosts();
-    if (!isEditing.value) loadLocalDraft();
+});
+
+onUnmounted(() => {
+    revokeObjectPreviewUrl();
 });
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;900&display=swap");
-
-.font-serif {
-    font-family: "Crimson Pro", Georgia, serif;
-}
-
 .fade-in {
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -582,21 +715,123 @@ onMounted(async () => {
     border-radius: 10px;
 }
 
-.preview-content-area {
-    font-size: 1.125rem;
-    line-height: 1.8;
+.article-content {
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    color: #334155;
 }
 
-:deep(.preview-content-area p) {
-    margin-bottom: 1.75rem;
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-weight: 900;
+    line-height: 1.25;
+    color: #020617;
 }
 
-:deep(.preview-content-area h2) {
-    font-family: "Crimson Pro", serif;
+.article-content h1 {
     font-size: 2rem;
+}
+
+.article-content h2 {
+    font-size: 1.625rem;
+}
+
+.article-content h3 {
+    font-size: 1.375rem;
+}
+
+.article-content h4 {
+    font-size: 1.125rem;
+}
+
+.article-content p {
+    margin: 1.25rem 0;
+}
+
+.article-content a {
+    color: #b42318;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.article-content a:hover {
+    color: #971b12;
+}
+
+.article-content img {
+    margin: 2rem 0;
+    max-width: 100%;
+    border-radius: 0.5rem;
+}
+
+.article-content blockquote {
+    margin: 1.5rem 0;
+    padding-left: 1.25rem;
+    border-left: 4px solid #b42318;
+    color: #475569;
+    font-style: italic;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.article-content ul {
+    list-style-type: disc;
+}
+
+.article-content ol {
+    list-style-type: decimal;
+}
+
+.article-content li {
+    margin: 0.4rem 0;
+}
+
+.article-content code {
+    background: #f1f5f9;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: ui-monospace, monospace;
+}
+
+.article-content pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+.article-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.925rem;
+}
+
+.article-content th,
+.article-content td {
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+}
+
+.article-content th {
+    background: #f8fafc;
     font-weight: 700;
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-    color: #111827;
 }
 </style>

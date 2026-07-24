@@ -11,12 +11,24 @@ const routes = [
 		name: "Category",
 		component: () => import("../views/Category.vue"),
 	},
-		{
-			path: "/create-post/:name?",
-			name: "CreatePost",
-			component: () => import("../views/CreatePost.vue"),
-			meta: { requiresAuth: true },
-		},
+	{
+		path: "/create-post/:name?",
+		name: "CreatePost",
+		component: () => import("../views/CreatePost.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/my-profile",
+		name: "Profile",
+		component: () => import("../views/Profile.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/my-blogs",
+		name: "MyBlogs",
+		component: () => import("../views/MyBlogs.vue"),
+		meta: { requiresAuth: true },
+	},
 	...authRoutes,
 ];
 

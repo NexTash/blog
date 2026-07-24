@@ -1,5 +1,5 @@
 <template>
-	<header class="w-full border-b border-gray-200 bg-white/95 backdrop-blur">
+	<header class="relative z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur">
 		<!-- Top bar: date + tagline -->
 		<div class="bg-gray-900 px-4 py-2 text-white md:px-8">
 			<div
@@ -7,7 +7,7 @@
 				<span>{{ formattedDate }}</span>
 				<span class="hidden items-center gap-2 sm:flex">
 					<span class="inline-block h-1 w-1 rounded-full bg-[#f97316]"></span>
-					Independent stories, fresh perspectives
+					UPDATED WEEKLY · REAL RATES · REAL SAVINGS
 				</span>
 			</div>
 		</div>
@@ -17,14 +17,13 @@
 			<div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
 				<!-- Brand -->
 				<router-link to="/" class="group max-w-2xl">
-					<p class="kicker mb-2">Digital Magazine</p>
+					<p class="kicker mb-2">GUIDES & RESOURCES</p>
 					<h1
 						class="text-4xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318] md:text-6xl">
-						NextNews
+						LeadOrbitUSA
 					</h1>
-					<p class="mt-3 max-w-xl text-sm leading-6 text-gray-500 md:text-base">
-						Curated articles, creator voices, and practical insight from the latest
-						posts.
+					<p class="mt-3 max-w-xl text-sm leading-6 text-[#b42318] md:text-base">
+						Helping you spend smarter on the decisions that matter most.
 					</p>
 				</router-link>
 
@@ -59,17 +58,37 @@
 							</svg>
 							New Story
 						</button>
+						<div class="relative z-[60]">
+							<button @click="toggleUserMenu"
+								class="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-1.5 shadow-sm transition-colors hover:border-[#b42318]">
+								<span
+									class="flex h-9 w-9 items-center justify-center rounded-full bg-[#b42318] text-sm font-black uppercase text-white">
+									{{ userInitial }}
+								</span>
+								<svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+									stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+							<div v-if="userMenuOpen"
+								class="absolute right-0 z-[9999] mt-2 w-56 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl shadow-gray-300/60">
+								<button @click="goToProfile"
+									class="block w-full px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50">
+									Profile
+								</button>
+								<button @click="goToMyBlogs"
+									class="block w-full px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50">
+									My Blogs
+								</button>
+								<button @click="handleLogout"
+									class="block w-full px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50">
+									Sign Out
+								</button>
+							</div>
+						</div>
 
 					</div>
-					<button @click="handleLogout"
-						class="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-[#b42318]">
-						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-							stroke-width="2.5">
-							<path stroke-linecap="round" stroke-linejoin="round"
-								d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-						</svg>
-						Sign Out
-					</button>
+
 				</div>
 			</div>
 		</div>
@@ -88,10 +107,22 @@ const router = useRouter();
 const now = ref(new Date());
 const auth = inject("$auth", null);
 const currentUser = ref(auth?.user || auth?.cookie?.user_id || null);
+const userMenuOpen = ref(false);
 
 const goToLogin = () => router.push("/login");
 const goToSignup = () => router.push("/signup");
 const goToCreatePost = () => router.push("/create-post");
+const goToProfile = () => {
+	router.push("/my-profile");
+	userMenuOpen.value = false;
+};
+const goToMyBlogs = () => {
+	router.push("/my-blogs");
+	userMenuOpen.value = false;
+};
+const toggleUserMenu = () => {
+	userMenuOpen.value = !userMenuOpen.value;
+};
 const goToBackendPosts = () => {
 	// router.push("/app/nextnews-workspace")
 	window.location.href = "/app/nextnews-workspace";
@@ -103,15 +134,37 @@ const goToBackendPosts = () => {
 
 const userRoles = ref([]);
 
+const normalizeRoles = (value) => {
+	if (!value) return [];
+	if (Array.isArray(value)) return value.filter(Boolean);
+	if (Array.isArray(value.roles)) return value.roles.filter(Boolean);
+	if (Array.isArray(value.data)) return value.data.filter(Boolean);
+	return [];
+};
+
 const isAdministrator = computed(() => {
 	const allowedRoles = ["System Manager"];
-	return userRoles.value.some(role => allowedRoles.includes(role));
+	const currentValue = currentUser.value;
+	const roleList = [
+		...normalizeRoles(userRoles.value),
+		...normalizeRoles(currentValue),
+	];
+
+	if (roleList.some((role) => allowedRoles.includes(role))) return true;
+
+	const identifier =
+		typeof currentValue === "string"
+			? currentValue
+			: currentValue?.email || currentValue?.username || currentValue?.name || "";
+
+	return ["admin@admin.com", "Administrator"].includes(identifier);
 });
 
 
 
 const handleLogout = async () => {
 	await auth?.logout?.();
+	userMenuOpen.value = false;
 	router.push("/");
 };
 
@@ -123,6 +176,15 @@ const formattedDate = computed(() =>
 		year: "numeric",
 	}),
 );
+
+const userDisplayName = computed(() => {
+	const value = currentUser.value;
+	if (!value) return "User";
+	if (typeof value === "string") return value;
+	return value.first_name || value.username || value.email || "User";
+});
+
+const userInitial = computed(() => userDisplayName.value.charAt(0).toUpperCase());
 
 async function refreshCurrentUser() {
 	if (!auth?.isLoggedIn) {
@@ -143,7 +205,7 @@ async function refreshCurrentUserRoles() {
 		return;
 	}
 	try {
-		userRoles.value = await siteApi.getCurrentUserRoles();
+		userRoles.value = normalizeRoles(await siteApi.getCurrentUserRoles());
 	} catch {
 		userRoles.value = [];
 	}

@@ -11,7 +11,7 @@
 						Get the best stories, weekly.
 					</h3>
 					<p class="mt-1.5 text-sm text-gray-400">
-						No spam. Curated picks from our editors, straight to you.
+						Home improvement tips, insurance guides, and money-saving picks — sent straight to your inbox
 					</p>
 				</div>
 
@@ -41,12 +41,11 @@
 				<!-- Brand column -->
 				<div class="lg:col-span-2">
 					<p class="text-xs font-black uppercase tracking-[0.28em] text-[#f97316]">
-						Digital Magazine
+						GUIDES & RESOURCES
 					</p>
-					<h2 class="mt-1 text-3xl font-black tracking-tight text-white">NextNews</h2>
+					<h2 class="mt-1 text-3xl font-black tracking-tight text-white">LeadOrbitUSA</h2>
 					<p class="mt-3 max-w-sm text-sm leading-6 text-gray-400">
-						Curated articles, creator voices, and practical insight. Stories that
-						matter, from writers who care.
+						We cover what actually matters: your home, your car, your money.
 					</p>
 					<div class="mt-5 flex items-center gap-3">
 						<a href="#" class="social-icon">
@@ -69,8 +68,12 @@
 					<h4 class="mb-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400">Navigate</h4>
 					<nav class="flex flex-col gap-2.5">
 						<router-link to="/" class="footer-link">Home</router-link>
-						<a href="#" class="footer-link">Latest Stories</a>
-						<a href="#" class="footer-link">Popular</a>
+						<a href="#" class="footer-link">Categories</a>
+						<a href="#" class="footer-link">Guides</a>
+						<a href="#" class="footer-link">About Us</a>Disclosure Policy
+						This post may contain links to partner services. We may receive compensation if you use these
+						services, at no extra cost to you.
+
 					</nav>
 				</div>
 
@@ -81,11 +84,11 @@
 						<a href="#" class="footer-link">About Us</a>
 						<a href="#" class="footer-link">Privacy Policy</a>
 						<a href="#" class="footer-link">Terms of Use</a>
+						<a href="#" class="footer-link">Disclosure Policy</a>
 					</nav>
 				</div>
 			</div>
 		</div>
-
 		<!-- Bottom bar -->
 		<div class="border-t border-white/10 py-6 text-xs text-gray-500">
 			<div class="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4">

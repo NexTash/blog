@@ -17,6 +17,7 @@ declare module 'vue' {
     MissedStories: typeof import('./src/components/MissedStories.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     PopularStories: typeof import('./src/components/PopularStories.vue')['default']
+    PostBodyEditor: typeof import('./src/components/PostBodyEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Slider: typeof import('./src/components/Slider.vue')['default']

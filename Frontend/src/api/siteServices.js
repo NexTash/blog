@@ -9,6 +9,10 @@ export const siteApi = {
 		return request("blog.api.get_current_user_roles");
 	},
 
+	getCurrentUserProfile() {
+		return request("blog.api.get_current_user_profile");
+	},
+
 	subscribeNewsletter(email) {
 		return postJson("blog.api.add_to_newsletter", { email });
 	},
