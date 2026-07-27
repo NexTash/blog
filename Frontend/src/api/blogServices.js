@@ -45,6 +45,10 @@ export const blogApi = {
 		return getResource("Blog Post", name);
 	},
 
+	recordPostClick(name) {
+		return postJson("blog.api.record_post_click", { name });
+	},
+
 	registerUser(payload) {
 		return postJson("blog.api.register_user", payload);
 	},
@@ -66,6 +70,7 @@ export const blogApi = {
 		formData.append("category", payload.category);
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("cta_button_url", payload.cta_button_url || "");
 		formData.append("status", payload.status || "Submitted for Review");
 
 		if (payload.meta_image) {
@@ -88,6 +93,7 @@ export const blogApi = {
 		formData.append("category", payload.category || "Uncategorized");
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("cta_button_url", payload.cta_button_url || "");
 		formData.append("status", payload.status || "Draft");
 
 		if (payload.meta_image) {
@@ -119,6 +125,7 @@ export const blogApi = {
 		formData.append("category", payload.category);
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
+		formData.append("cta_button_url", payload.cta_button_url || "");
 		formData.append("status", payload.status || "Submitted for Review");
 
 		if (payload.meta_image) {

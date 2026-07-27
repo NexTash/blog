@@ -8,7 +8,7 @@
 						Stay in the loop
 					</p>
 					<h3 class="mt-1 text-xl font-black text-white">
-						Get the best stories, weekly.
+						Get the best Updates, weekly.
 					</h3>
 					<p class="mt-1.5 text-sm text-gray-400">
 						Home improvement tips, insurance guides, and money-saving picks — sent straight to your inbox

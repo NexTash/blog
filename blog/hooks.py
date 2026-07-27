@@ -11,14 +11,14 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# fixtures = [
-#     {
-#         "doctype": "Social Login Key"
-#     },
-#     {
-#         "doctype": "Custom Field"
-#     }
-# ]
+fixtures = [
+    {
+        "doctype": "Dashboard Chart"
+    },
+    {
+        "doctype": "Notification"
+    }
+]
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page

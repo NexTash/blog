@@ -1,0 +1,45 @@
+[
+ {
+  "attach_files": "",
+  "attach_print": 0,
+  "channel": "Email",
+  "condition": "doc.published == 1",
+  "date_changed": null,
+  "days_in_advance": 0,
+  "docstatus": 0,
+  "doctype": "Notification",
+  "document_type": "Blog Post",
+  "enabled": 1,
+  "event": "Value Change",
+  "from_attach_field": null,
+  "is_standard": 0,
+  "message": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;\">\n    \n    <!-- Header Area -->\n    <div style=\"background-color: #2563eb; padding: 25px; text-align: center;\">\n        <h2 style=\"margin: 0; color: #ffffff; font-size: 24px;\">Your Post is Live! 🎉</h2>\n    </div>\n    \n    <!-- Body Content -->\n    <div style=\"padding: 30px; color: #374151; line-height: 1.6;\">\n        <p style=\"font-size: 16px; margin-top: 0;\">Hello,</p>\n        <p style=\"font-size: 16px;\">Great news! The admin team has just reviewed and published your latest blog post. It is now live on the site and ready to be read by your audience.</p>\n        \n        <!-- Highlighted Post Details -->\n        <div style=\"background-color: #f3f4f6; padding: 20px; border-left: 4px solid #2563eb; margin: 25px 0; border-radius: 0 8px 8px 0;\">\n            <h3 style=\"margin: 0 0 8px 0; color: #111827; font-size: 18px;\">{{ doc.title }}</h3>\n            <p style=\"margin: 0; color: #6b7280; font-size: 14px;\">\n                <strong>Category:</strong> {{ doc.blog_category }}\n            </p>\n        </div>\n        \n        <p style=\"font-size: 16px;\">We encourage you to share it with your network!</p>\n        <p style=\"font-size: 16px; margin-bottom: 5px;\">Keep up the fantastic work,</p>\n        <p style=\"font-size: 16px; margin-top: 0; font-weight: bold;\">The Admin Team</p>\n    </div>\n    \n    <!-- Footer Area -->\n    <div style=\"background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;\">\n        <p style=\"margin: 0; color: #9ca3af; font-size: 12px;\">\n            This is an automated notification from your blogging platform. Please do not reply directly to this email.\n        </p>\n    </div>\n\n</div>",
+  "message_type": "Markdown",
+  "method": null,
+  "modified": "2026-06-21 00:40:57.295718",
+  "module": null,
+  "name": "Blog Post Published Alert",
+  "print_format": null,
+  "property_value": null,
+  "recipients": [
+   {
+    "bcc": null,
+    "cc": null,
+    "condition": null,
+    "parent": "Blog Post Published Alert",
+    "parentfield": "recipients",
+    "parenttype": "Notification",
+    "receiver_by_document_field": "owner",
+    "receiver_by_role": null
+   }
+  ],
+  "send_system_notification": 0,
+  "send_to_all_assignees": 0,
+  "sender": "",
+  "sender_email": "",
+  "set_property_after_alert": null,
+  "slack_webhook_url": null,
+  "subject": "Your blog post \"{{doc.title}}\" is now live!",
+  "value_changed": "published"
+ }
+]

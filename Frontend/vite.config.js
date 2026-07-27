@@ -39,6 +39,9 @@ export default defineConfig({
 		outDir: "../blog/public/Frontend",
 		emptyOutDir: true,
 		target: "es2015",
+		// The text editor route is already lazy-loaded; this keeps Vite from warning
+		// about the known heavy editor chunk on every build.
+		chunkSizeWarningLimit: 650,
 		rollupOptions: {
 			checks: {
 				pluginTimings: false,

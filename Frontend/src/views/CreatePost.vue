@@ -120,7 +120,7 @@
                                 </div>
 
                                 <!-- Content Body -->
-                                <PostBodyEditor v-model="form.content" :word-count="wordCount" />
+                                <PostBodyEditor :key="editorKey" v-model="form.content" :word-count="wordCount" />
 
                                 <!-- Intro/Summary -->
                                 <div
@@ -170,12 +170,11 @@
                                             <span v-else>{{ submitButtonLabel }}</span>
                                         </button>
 
-                                        <!-- LOCAL SAVE BUTTON: Only visible if not a system manager -->
-                                        <button v-if="!isSystemManager" type="button" @click="saveToLocal"
+                                        <button type="button" @click="saveToLocal"
                                             :disabled="isSavingDraft || isSubmitting"
                                             class="w-full rounded-xl border border-gray-700 bg-transparent py-3 text-[10px] uppercase tracking-widest text-black bg-white transition-all">
                                             <span v-if="isSavingDraft">Saving Draft...</span>
-                                            <span v-else>Save Progress</span>
+                                            <span v-else>{{ saveButtonLabel }}</span>
                                         </button>
                                         <p v-if="localSaveMessage"
                                             class="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">
@@ -264,47 +263,24 @@
                                     </div>
                                 </div>
 
-                                <!-- Post Management -->
-                                <div class="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">{{
-                                            sidebarListTitle }}</h3>
-                                        <button @click="startFreshStory" type="button"
-                                            class="text-[10px] text-blue-600 font-bold hover:text-blue-800 transition-colors uppercase tracking-widest bg-blue-50 px-2 py-1 rounded">New</button>
-                                    </div>
-                                    <div v-if="isLoadingPendingPosts" class="py-4 text-center">
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-widest text-gray-400 animate-pulse">Loading...</span>
-                                    </div>
-                                    <div v-else-if="!pendingPosts.length"
-                                        class="text-xs text-gray-400 py-4 italic text-center">No stories
-                                        found.</div>
-                                    <div v-else class="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                        <div v-for="post in pendingPosts" :key="post.name"
-                                            class="rounded-xl border p-3 transition-all cursor-pointer group"
-                                            :class="post.name === editingPostName ? 'border-black bg-black text-white shadow-md' : 'border-gray-200 bg-gray-50 hover:bg-white hover:border-gray-300'"
-                                            @click="openPendingPost(post.name)">
-                                            <div class="flex items-start gap-3">
-                                                <div class="min-w-0 flex-1">
-                                                    <p class="text-xs font-bold line-clamp-1"
-                                                        :class="post.name === editingPostName ? 'text-white' : 'text-gray-900'">
-                                                        {{ post.title ||
-                                                        'Untitled' }}</p>
-                                                    <p class="text-[9px] mt-1 uppercase tracking-widest"
-                                                        :class="post.name === editingPostName ? 'text-gray-400' : 'text-gray-500'">
-                                                        {{
-                                                        formatDate(post.modified) }}</p>
-                                                </div>
-                                                <button type="button" @click.stop="deletePendingPost(post)"
-                                                    :disabled="deletingPostName === post.name"
-                                                    class="shrink-0 rounded-lg px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                                    :class="post.name === editingPostName ? 'bg-white/10 text-white hover:bg-red-500' : 'bg-gray-200 text-gray-600 hover:bg-red-100 hover:text-red-700'">
-                                                    {{ deletingPostName === post.name ? "..." : "Del" }}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div v-if="isSystemManager"
+                                    class="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
+                                    <label for="cta-button-url"
+                                        class="mb-3 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">
+                                        CTA Button Link
+                                    </label>
+                                    <input id="cta-button-url" v-model="form.cta_button_url" type="url"
+                                        placeholder="https://example.com/get-quote"
+                                        class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors focus:border-black focus:ring-1 focus:ring-black" />
+                                    <!-- <p class="mt-3 text-xs leading-6 text-gray-500">
+                                        This link is used by the in-article
+                                        <span class="font-bold text-gray-700">CTA</span>
+                                        block and is editable only for
+                                        <span class="font-bold text-gray-700">System Manager</span>.
+                                    </p> -->
                                 </div>
+
+            
                             </div>
                         </aside>
                     </form>
@@ -331,7 +307,7 @@
                                 <span v-else class="kicker">Uncategorized</span>
 
                                 <h1
-                                    class="mt-4 text-4xl font-black leading-tight tracking-tight text-gray-900 md:text-5xl">
+                                    class="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-[34px] md:text-[38px]">
                                     {{ form.title || "Untitled Story" }}
                                 </h1>
 
@@ -343,7 +319,7 @@
                                             day: "numeric",
                                             year: "numeric",
                                         })
-                                        }}</span>
+                                    }}</span>
                                     <span aria-hidden="true" class="text-gray-300">|</span>
                                     <span>Preview Author</span>
                                 </div>
@@ -355,8 +331,8 @@
                                         class="max-h-[520px] w-full object-cover" />
                                 </div>
 
-                                <p v-if="form.blog_intro"
-                                    class="bg-[#FFF44F] py-4 pl-5 pr-4 text-xl leading-8 text-gray-800 md:text-2xl">
+                                <p v-if="form.blog_intro" class=" py-4 pl-5 pr-4 text-xl leading-8 md:text-2xl
+                                    bg-[#CC2929] opacity-85 text-white shadow-xl/20 rounded-2xl">
                                     {{ form.blog_intro }}
                                 </p>
 
@@ -364,12 +340,49 @@
 
                                 <div class="article-content" v-html="previewContent"></div>
 
+                                <div v-if="hasPreviewSourcesSection"
+                                    class="mt-12 rounded-xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
+                                    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                                        <div class="min-w-0 flex-1">
+                                            <h3
+                                                class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
+                                                Sources & Resources
+                                            </h3>
+                                            <ul v-if="previewBacklinks.length" class="space-y-4">
+                                                <li v-for="(link, index) in previewBacklinks" :key="`preview-${index}`"
+                                                    class="flex items-start gap-3 group">
+                                                    <svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    <a :href="link.href" target="_blank" rel="noopener noreferrer"
+                                                        class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
+                                                        {{ link.label }}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div v-if="shouldShowPreviewCta"
+                                            class="shrink-0"
+                                            :class="previewBacklinks.length ? 'border-t border-gray-200 pt-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0' : ''">
+                                            <a
+                                                :href="safePreviewCtaButtonUrl"
+                                                target="_blank"
+                                                rel="noopener noreferrer nofollow"
+                                                class="inline-flex w-full items-center justify-center rounded-full bg-[#b42318] px-7 py-4 text-center text-xs font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#971b12] sm:w-auto"
+                                            >
+                                                Get Free Quote Now!
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mt-12 border-t border-gray-200 pt-8">
                                     <h2 class="text-lg font-bold text-gray-900">Disclosure Policy</h2>
                                     <p class="text-sm text-gray-500">
                                         This post may contain links to partner services. We may receive compensation if
-                                        you use these
-                                        services, at no extra cost to you.
+                                        you use these services, at no extra cost to you.
                                     </p>
                                 </div>
                             </article>
@@ -382,19 +395,19 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { blogApi } from "../api/blogServices.js";
-import { formatDate, getImageUrl, sanitizeHtml, stripHtml } from "../utils/post";
+import { siteApi } from "../api/siteServices";
+import PostBodyEditor from "../components/PostBodyEditor.vue";
+import { formatDate, getImageUrl, getSafeUrl, sanitizeHtml, stripHtml } from "../utils/post";
 
 // Hooks & Routing
 const route = useRoute();
 const router = useRouter();
-const PostBodyEditor = defineAsyncComponent(() => import("../components/PostBodyEditor.vue"));
 
-// Auth Mock
-const authState = reactive({ user: { role: 'Author' } });
-const isSystemManager = computed(() => authState.user.role === 'System Manager');
+const userRoles = ref([]);
+const isSystemManager = computed(() => userRoles.value.includes("System Manager"));
 
 // Component State
 const loading = ref(false);
@@ -419,6 +432,11 @@ const isDragOver = ref(false);
 const publishButton = ref(null);
 const localSaveMessage = ref("");
 const objectPreviewUrl = ref("");
+const currentPostStatus = ref("Draft");
+const currentPostPublished = ref(false);
+
+// Editor key — incrementing this forces Tiptap to remount with fresh content
+const editorKey = ref(0);
 
 // Form State
 const tagInput = ref("");
@@ -429,27 +447,79 @@ const form = reactive({
     category: "",
     tags: [],
     backlinks: [],
+    cta_button_url: "",
 });
 
-// Computed
 const editingPostName = computed(() => route.params.name || "");
 const isEditing = computed(() => !!editingPostName.value);
-const successTitle = computed(() => isEditing.value ? "Story Updated!" : "Story Submitted!");
+const isEditingPublishedPost = computed(
+    () => isEditing.value && (currentPostPublished.value || currentPostStatus.value === "Published"),
+);
+const successTitle = computed(() => {
+    if (!isEditing.value) {
+        return isSystemManager.value ? "Story Published!" : "Story Submitted!";
+    }
+
+    if (isEditingPublishedPost.value && !isSystemManager.value) {
+        return "Story Resubmitted!";
+    }
+
+    return isSystemManager.value ? "Published Changes Saved!" : "Story Updated!";
+});
 const plainContent = computed(() => stripHtml(form.content));
-const isFormValid = computed(() => form.title.trim().length > 5 && plainContent.value.length > 10);
+const isFormValid = computed(() => {
+    const hasTitle = form.title.trim().length > 5;
+    const hasContent = plainContent.value.length > 10 || form.content.trim().length > 0;
+    return hasTitle && hasContent;
+});
 const wordCount = computed(() => plainContent.value.split(/\s+/).filter(Boolean).length);
 const previewContent = computed(() => sanitizeHtml(form.content));
+const safePreviewCtaButtonUrl = computed(() => getSafeUrl(form.cta_button_url));
+const shouldShowPreviewCta = computed(
+    () => Boolean(form.cta_button_url) && safePreviewCtaButtonUrl.value !== "#",
+);
+const previewBacklinks = computed(() =>
+    form.backlinks
+        .map((backlink) => ({
+            href: getSafeUrl(backlink?.url),
+            label: String(backlink?.label || "Reference Link").trim() || "Reference Link",
+        }))
+        .filter((backlink) => backlink.href !== "#"),
+);
+const hasPreviewSourcesSection = computed(
+    () => previewBacklinks.value.length > 0 || shouldShowPreviewCta.value,
+);
 
 const headerTitle = computed(() => {
-    if (isEditing.value) return isSystemManager.value ? "Edit Published Story" : "Edit Pending Story";
+    if (isEditing.value) {
+        if (isEditingPublishedPost.value) return "Edit Published Story";
+        if (currentPostStatus.value === "Submitted for Review") return "Edit Review Submission";
+        return "Edit Draft Story";
+    }
+
     return "Create New Story";
 });
 
-const sidebarListTitle = computed(() => isSystemManager.value ? "System Database" : "Your Unpublished Stories");
+// const sidebarListTitle = computed(() =>
+//     isSystemManager.value ? "Drafts & Review Queue" : "Your Unpublished Stories",
+// );
 
 const submitButtonLabel = computed(() => {
-    if (isEditing.value) return "Update Changes";
-    return isSystemManager.value ? "Publish Immediately" : "Submit for Review";
+    if (isSystemManager.value) {
+        if (isEditingPublishedPost.value) return "Save & Publish";
+        return isEditing.value ? "Publish Changes" : "Publish Now";
+    }
+
+    if (isEditingPublishedPost.value) return "Resubmit for Review";
+    return isEditing.value ? "Update Review Submission" : "Submit for Review";
+});
+
+const saveButtonLabel = computed(() => {
+    if (isEditingPublishedPost.value) {
+        return isSystemManager.value ? "Save & Publish" : "Save for Review";
+    }
+
+    return "Save Progress";
 });
 
 const saveToLocal = async () => {
@@ -462,6 +532,9 @@ const saveToLocal = async () => {
             status: "Draft",
         });
 
+        if (response.post) {
+            applyPostToForm(response.post);
+        }
         localSaveMessage.value = response.message || "Draft saved successfully.";
         await fetchPendingPosts();
 
@@ -479,7 +552,7 @@ const saveToLocal = async () => {
     }
 };
 
-// --- Core Functions ---
+
 
 function revokeObjectPreviewUrl() {
     if (objectPreviewUrl.value) {
@@ -504,7 +577,7 @@ function buildSubmitPayload() {
     return {
         title: form.title.trim(),
         blog_intro: form.blog_intro.trim(),
-        content: form.content,
+        content: normalizeLegacyFaqEditorContent(form.content),
         category: form.category,
         tags: [...form.tags],
         backlinks: form.backlinks
@@ -513,6 +586,7 @@ function buildSubmitPayload() {
                 url: String(backlink?.url || "").trim(),
             }))
             .filter((backlink) => backlink.url),
+        cta_button_url: form.cta_button_url.trim(),
         meta_image: imageFile.value,
     };
 }
@@ -520,9 +594,11 @@ function buildSubmitPayload() {
 function applyPostToForm(post) {
     if (!post) return;
     imageFile.value = null;
+    currentPostStatus.value = post.custom_post_status || (post.published ? "Published" : "Draft");
+    currentPostPublished.value = Boolean(post.published);
     form.title = post.title || "";
     form.blog_intro = post.blog_intro || "";
-    form.content = post.content || "";
+    form.content = normalizeLegacyFaqEditorContent(post.content || "");
     form.category = post.blog_category || "";
     form.tags = Array.isArray(post.tags) ? [...post.tags] : [];
     form.backlinks = Array.isArray(post.backlinks)
@@ -531,18 +607,106 @@ function applyPostToForm(post) {
             url: backlink?.url || "",
         }))
         : [];
+    form.cta_button_url = post.custom_cta_button_url || "";
     setImagePreview(post.meta_image ? getImageUrl(post.meta_image) : null);
     localSaveMessage.value = "";
 }
 
 function resetComposerState() {
+    currentPostStatus.value = "Draft";
+    currentPostPublished.value = false;
     Object.assign(form, {
-        title: "", blog_intro: "", content: "", category: categories.value[0]?.name || "", tags: [], backlinks: []
+        title: "",
+        blog_intro: "",
+        content: "",
+        category: categories.value[0]?.name || "",
+        tags: [],
+        backlinks: [],
+        cta_button_url: "",
     });
     clearImage();
     error.value = "";
     localSaveMessage.value = "";
     activeTab.value = "write";
+    editorKey.value++;
+}
+
+function normalizeLegacyFaqEditorContent(html) {
+    if (!html || (!html.includes("faq-accordion") && !html.includes("FAQ:") && !html.includes("CTA:"))) {
+        return html || "";
+    }
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    template.content.querySelectorAll("blockquote").forEach((node) => {
+        const firstParagraph = node.querySelector("p");
+        const firstText = (firstParagraph?.textContent || "").trim();
+        if (!firstText.startsWith("CTA:")) {
+            return;
+        }
+
+        const spacer = node.nextElementSibling;
+        node.remove();
+        if (spacer?.tagName === "P" && !(spacer.textContent || "").trim()) {
+            spacer.remove();
+        }
+    });
+
+    template.content.querySelectorAll('details[data-type="faq-accordion"], details.faq-accordion').forEach((node) => {
+        const question = node.querySelector("summary")?.textContent?.trim() || "FAQ: Add your question here";
+        const answer =
+            node.querySelector(".faq-accordion__answer")?.innerHTML?.trim() || "<p>Add the answer here.</p>";
+
+        const replacement = document.createElement("div");
+        replacement.innerHTML = `
+            <blockquote>
+                <p>FAQ: ${question}</p>
+                ${answer}
+            </blockquote>
+            <p></p>
+        `;
+
+        node.replaceWith(...replacement.children);
+    });
+
+    const candidates = template.content.querySelectorAll("h1, h2, h3, h4, h5, h6, p");
+
+    candidates.forEach((node) => {
+        const text = (node.textContent || "").trim();
+        if (!text.startsWith("FAQ:")) {
+            return;
+        }
+
+        const nextElement = node.nextElementSibling;
+        if (!nextElement) {
+            return;
+        }
+
+        const answerTags = new Set(["P", "BLOCKQUOTE", "UL", "OL", "DIV"]);
+        if (!answerTags.has(nextElement.tagName)) {
+            return;
+        }
+
+        const wrapper = document.createElement("blockquote");
+        const questionParagraph = document.createElement("p");
+        questionParagraph.textContent = text;
+
+        wrapper.appendChild(questionParagraph);
+
+        if (nextElement.tagName === "BLOCKQUOTE") {
+            wrapper.innerHTML += nextElement.innerHTML;
+        } else {
+            wrapper.appendChild(nextElement.cloneNode(true));
+        }
+
+        const spacer = document.createElement("p");
+        node.replaceWith(wrapper);
+        nextElement.remove();
+        wrapper.after(spacer);
+    });
+
+    return template.innerHTML;
 }
 
 const openPendingPost = async (name) => {
@@ -672,6 +836,12 @@ const handleSubmit = async (event) => {
 
 onMounted(async () => {
     try {
+        userRoles.value = await siteApi.getCurrentUserRoles();
+    } catch (e) {
+        userRoles.value = [];
+    }
+
+    try {
         categories.value = await blogApi.getCategories();
         if (!isEditing.value && !form.category && categories.value.length) {
             form.category = categories.value[0].name;
@@ -763,9 +933,37 @@ onUnmounted(() => {
 }
 
 .article-content img {
+    display: block;
     margin: 2rem 0;
     max-width: 100%;
     border-radius: 0.5rem;
+}
+
+.article-content img[data-align="left"] {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.article-content img[data-align="center"] {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.article-content img[data-align="right"] {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.article-content img[data-float="left"] {
+    float: left;
+    margin-right: 1.25rem;
+    margin-left: 0;
+}
+
+.article-content img[data-float="right"] {
+    float: right;
+    margin-left: 1.25rem;
+    margin-right: 0;
 }
 
 .article-content blockquote {
@@ -774,6 +972,36 @@ onUnmounted(() => {
     border-left: 4px solid #b42318;
     color: #475569;
     font-style: italic;
+}
+
+.article-content details[data-type="faq-accordion"],
+.article-content details.faq-accordion {
+    margin: 1.5rem 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    background: #f8fafc;
+}
+
+.article-content details[data-type="faq-accordion"] summary,
+.article-content details.faq-accordion summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1rem 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.article-content details[data-type="faq-accordion"] summary::-webkit-details-marker,
+.article-content details.faq-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.article-content .faq-accordion__answer {
+    white-space: pre-line;
+    border-top: 1px solid #e2e8f0;
+    padding: 0 1.25rem 1rem;
+    color: #475569;
 }
 
 .article-content ul,

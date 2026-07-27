@@ -1,11 +1,11 @@
 <template>
-	<section id="popular" class="bg-[#f6f3ee] px-6 pt-20 pb-10">
+	<section id="popular" class="bg-[#f6f3ee] px-4 pb-10 pt-16 sm:px-6 sm:pt-20">
 		<div class="mx-auto max-w-7xl">
 			<!-- Section Header -->
-			<div class="mb-12 flex items-end justify-between border-b border-gray-200 pb-6">
+			<div class="mb-10 flex flex-col gap-4 border-b border-gray-200 pb-6 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
 				<div>
 					<span class="text-[12px] font-bold uppercase tracking-[0.3em] text-[#b42318]">Trending Now</span>
-					<h2 class="mt-2 text-4xl font-black uppercase tracking-tighter text-gray-900">
+					<h2 class="mt-2 text-3xl font-black uppercase tracking-tighter text-gray-900 sm:text-4xl">
 						Popular Blogs
 					</h2>
 				</div>
@@ -18,9 +18,9 @@
 				<article v-for="(post, i) in popularPosts" :key="post.name"
 					class="group relative px-0 sm:px-6 lg:border-r lg:border-gray-200 last:border-r-0">
 					<!-- Rank Number (Graphic Element) -->
-					<div class="absolute -top-8 left-0 z-0 select-none overflow-hidden sm:left-4">
+					<div class="absolute -top-6 left-0 z-0 select-none overflow-hidden sm:-top-8 sm:left-4">
 						<span
-							class="text-8xl font-black leading-none text-gray-200/60 transition-colors duration-500 group-hover:text-[#b42318]/10">
+							class="text-7xl font-black leading-none text-gray-200/60 transition-colors duration-500 group-hover:text-[#b42318]/10 sm:text-8xl">
 							{{ String(i + 1).padStart(2, "0") }}
 						</span>
 					</div>
@@ -49,6 +49,9 @@
 							</span>
 							<span class="text-[11px] font-medium text-gray-400">
 								{{ formatDate(post.published_on, { month: "long", day: "numeric", year: "numeric" }) }}
+							</span>
+							<span class="text-[11px] font-bold uppercase tracking-widest text-[#b42318]">
+								{{ formatClickCount(post.custom_click_count) }}
 							</span>
 						</div>
 
@@ -79,8 +82,22 @@ const props = defineProps({
 	}
 });
 
-// Logic: Slice top 4 for the "Popular" grid
-const popularPosts = computed(() => (props.posts || []).slice(0, 4));
+const popularPosts = computed(() =>
+	[...(props.posts || [])]
+		.sort((left, right) => {
+			const leftClicks = Number(left?.custom_click_count || 0);
+			const rightClicks = Number(right?.custom_click_count || 0);
+
+			if (rightClicks !== leftClicks) {
+				return rightClicks - leftClicks;
+			}
+
+			return new Date(right?.published_on || 0) - new Date(left?.published_on || 0);
+		})
+		.slice(0, 4),
+);
+
+const formatClickCount = (count) => `${Number(count || 0)} Views`;
 </script>
 
 <style scoped>

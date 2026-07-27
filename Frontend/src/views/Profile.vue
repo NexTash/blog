@@ -40,7 +40,7 @@
 						class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20 mix-blend-overlay">
 					</div>
 
-					<div class="relative grid gap-10 px-8 py-10 md:grid-cols-[1.3fr_0.7fr] md:px-10 md:py-12 lg:gap-16">
+					<div class="relative grid gap-8 px-6 py-8 md:grid-cols-[1.3fr_0.7fr] md:px-10 md:py-12 lg:gap-16">
 						<!-- Author Info -->
 						<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
 							<div
@@ -159,8 +159,14 @@
 								</div>
 
 								<router-link :to="postLink(post)"
-									class="btn-secondary mt-2 shrink-0 opacity-100 transition-opacity sm:mt-0 lg:opacity-0 lg:group-hover:opacity-100">
-									{{ postStatus(post) === "Published" ? "Read story" : "Edit draft" }}
+									class="btn-secondary mt-2 w-full justify-center shrink-0 opacity-100 transition-opacity sm:mt-0 sm:w-auto lg:opacity-0 lg:group-hover:opacity-100">
+									{{
+										postStatus(post) === "Published"
+											? "Edit published story"
+											: postStatus(post) === "Submitted for Review"
+												? "Edit submission"
+												: "Edit draft"
+									}}
 								</router-link>
 							</article>
 						</div>
@@ -257,9 +263,6 @@ const avatarUrl = computed(() => {
 });
 
 function postLink(post) {
-	if (postStatus(post) === "Published") {
-		return { name: "PostDetail", params: { name: post.name } };
-	}
 	return { name: "CreatePost", params: { name: post.name } };
 }
 

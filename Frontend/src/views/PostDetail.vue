@@ -26,7 +26,7 @@
 				</router-link>
 				<span v-else class="kicker">Uncategorized</span>
 
-				<h1 class="mt-4 text-[28px] font-black leading-tight tracking-tight text-gray-900 md:text-[24px]">
+				<h1 class="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-[34px] md:text-[38px]">
 					{{ postData.title }}
 				</h1>
 
@@ -41,6 +41,8 @@
 					}}</span>
 					<span aria-hidden="true" class="text-gray-300">|</span>
 					<span>{{ postData.blogger || "Theme Admin" }}</span>
+					<span aria-hidden="true" class="text-gray-300">|</span>
+					<span>{{ formatClickCount(postData.custom_click_count) }}</span>
 				</div>
 
 				<div class="my-10 overflow-hidden rounded-lg bg-gray-100 shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
@@ -48,7 +50,8 @@
 						class="max-h-[520px] w-full object-cover" />
 				</div>
 
-				<p v-if="postData.blog_intro" class="py-4 pl-5 pr-4 text-4xl leading-8 text-gray-800 md:text-[24px] ">
+				<p v-if="postData.blog_intro"
+					class="py-4 pl-5 pr-4 text-xl leading-8 md:text-2xl bg-[#CC2929] opacity-85 text-white shadow-xl/20 rounded-2xl">
 					{{ postData.blog_intro }}
 				</p>
 
@@ -56,25 +59,38 @@
 
 				<div class="article-content" v-html="safeContent"></div>
 
-				<div v-if="postData.custom_backlinks && postData.custom_backlinks.length"
-					class="mt-12 rounded-xl bg-gray-50 p-8 border border-gray-100 shadow-sm">
-					<h3
-						class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
-						Sources & Resources
-					</h3>
-					<ul class="space-y-4">
-						<li v-for="(link, index) in safeBacklinks" :key="index" class="flex items-start gap-3 group">
-							<svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
-								fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-									d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-							</svg>
-							<a :href="link.href" target="_blank" rel="noopener noreferrer"
-								class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
-								Reference Link
+				<div v-if="hasSourcesSection"
+					class="mt-12 rounded-xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
+					<div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+						<div class="min-w-0 flex-1">
+						<h3
+							class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
+							Sources & Resources
+						</h3>
+						<ul v-if="safeBacklinks.length" class="space-y-4">
+							<li v-for="(link, index) in safeBacklinks" :key="index"
+								class="flex items-start gap-3 group">
+								<svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
+									fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+								</svg>
+								<a :href="link.href" target="_blank" rel="noopener noreferrer"
+									class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
+									{{ link.label }}
+								</a>
+							</li>
+						</ul>
+						</div>
+						<div v-if="shouldShowCta"
+							class="shrink-0"
+							:class="safeBacklinks.length ? 'border-t border-gray-200 pt-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0' : ''">
+							<a :href="safeCtaButtonUrl" target="_blank" rel="noopener noreferrer nofollow"
+								class="inline-flex w-full items-center justify-center rounded-full bg-[#b42318] px-7 py-4 text-center text-xs font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#971b12] sm:w-auto">
+								Get Free Quote Now!
 							</a>
-						</li>
-					</ul>
+						</div>
+					</div>
 				</div>
 
 				<div class="mt-14 border-t border-gray-200 pt-8">
@@ -138,10 +154,23 @@ const loading = ref(true);
 const error = ref("");
 
 const safeContent = computed(() => sanitizeHtml(postData.value?.content));
+const safeCtaButtonUrl = computed(() => getSafeUrl(postData.value?.custom_cta_button_url));
+const shouldShowCta = computed(
+	() =>
+		Boolean(postData.value?.custom_cta_button_url) &&
+		safeCtaButtonUrl.value !== "#" &&
+		!postData.value?.hide_cta,
+);
 const safeBacklinks = computed(() =>
 	(postData.value?.custom_backlinks || [])
-		.map((link) => ({ href: getSafeUrl(link.link_of_original_source) }))
+		.map((link) => ({
+			href: getSafeUrl(link.link_of_original_source),
+			label: String(link.link_label || link.label || "Reference Link").trim() || "Reference Link",
+		}))
 		.filter((link) => link.href !== "#"),
+);
+const hasSourcesSection = computed(
+	() => safeBacklinks.value.length > 0 || shouldShowCta.value,
 );
 
 const fetchFullPost = async () => {
@@ -149,7 +178,17 @@ const fetchFullPost = async () => {
 	error.value = "";
 
 	try {
-		postData.value = await blogApi.getPost(route.params.name);
+		const post = await blogApi.getPost(route.params.name);
+		postData.value = post;
+
+		try {
+			const clickData = await blogApi.recordPostClick(route.params.name);
+			if (postData.value) {
+				postData.value.custom_click_count = clickData?.click_count || 0;
+			}
+		} catch (trackingError) {
+			console.warn("Unable to record post click.", trackingError);
+		}
 	} catch (error) {
 		postData.value = null;
 		error.value = error.message;
@@ -157,6 +196,8 @@ const fetchFullPost = async () => {
 		loading.value = false;
 	}
 };
+
+const formatClickCount = (count) => `${Number(count || 0)} Views`;
 
 watch(() => route.params.name, fetchFullPost, { immediate: true });
 </script>
@@ -210,9 +251,37 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 }
 
 .article-content img {
+	display: block;
 	margin: 2rem 0;
 	max-width: 100%;
 	border-radius: 0.5rem;
+}
+
+.article-content img[data-align="left"] {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+.article-content img[data-align="center"] {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.article-content img[data-align="right"] {
+	margin-left: auto;
+	margin-right: 0;
+}
+
+.article-content img[data-float="left"] {
+	float: left;
+	margin-right: 1.25rem;
+	margin-left: 0;
+}
+
+.article-content img[data-float="right"] {
+	float: right;
+	margin-left: 1.25rem;
+	margin-right: 0;
 }
 
 .article-content blockquote {
@@ -221,6 +290,36 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	border-left: 4px solid #b42318;
 	color: #475569;
 	font-style: italic;
+}
+
+.article-content details[data-type="faq-accordion"],
+.article-content details.faq-accordion {
+	margin: 1.5rem 0;
+	overflow: hidden;
+	border: 1px solid #e2e8f0;
+	border-radius: 1rem;
+	background: #f8fafc;
+}
+
+.article-content details[data-type="faq-accordion"] summary,
+.article-content details.faq-accordion summary {
+	cursor: pointer;
+	list-style: none;
+	padding: 1rem 1.25rem;
+	font-weight: 800;
+	color: #0f172a;
+}
+
+.article-content details[data-type="faq-accordion"] summary::-webkit-details-marker,
+.article-content details.faq-accordion summary::-webkit-details-marker {
+	display: none;
+}
+
+.article-content .faq-accordion__answer {
+	white-space: pre-line;
+	border-top: 1px solid #e2e8f0;
+	padding: 0 1.25rem 1rem;
+	color: #475569;
 }
 
 .article-content ul,

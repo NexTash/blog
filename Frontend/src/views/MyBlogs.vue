@@ -143,9 +143,9 @@
 							<div class="mt-auto flex flex-wrap gap-3 pt-6">
 								<router-link
 									:to="primaryActionLink(post)"
-									class="btn-primary"
+									class="btn-primary w-full justify-center sm:w-auto"
 								>
-									{{ postStatus(post) === "Published" ? "View story" : "Edit draft" }}
+									{{ primaryActionLabel(post) }}
 								</router-link>
 							</div>
 						</div>
@@ -245,11 +245,19 @@ const filteredPosts = computed(() => {
 });
 
 function primaryActionLink(post) {
+	return { name: "CreatePost", params: { name: post.name } };
+}
+
+function primaryActionLabel(post) {
 	if (postStatus(post) === "Published") {
-		return { name: "PostDetail", params: { name: post.name } };
+		return "Edit published story";
 	}
 
-	return { name: "CreatePost", params: { name: post.name } };
+	if (postStatus(post) === "Submitted for Review") {
+		return "Edit submission";
+	}
+
+	return "Edit draft";
 }
 
 function resetFilters() {

@@ -1,11 +1,11 @@
 <template>
-	<section class="bg-[#f8f6f2] px-6 py-20">
+	<section class="bg-[#f8f6f2] px-4 py-16 sm:px-6 sm:py-20">
 		<div class="mx-auto max-w-7xl">
 			<!-- Section Header with Editorial Line -->
-			<div class="mb-10 flex items-center justify-between">
+			<div class="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
 				<div class="flex items-center gap-4">
 					<!-- <span class="h-px w-12 bg-[#b42318]"></span> -->
-					<h2 class="text-2xl font-black uppercase tracking-widest text-gray-900">
+					<h2 class="text-xl font-black uppercase tracking-widest text-gray-900 sm:text-2xl">
 						You May Have Missed
 					</h2>
 				</div>

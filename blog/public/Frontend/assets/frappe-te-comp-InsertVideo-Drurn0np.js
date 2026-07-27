@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-QTnfLwEv.js";import{$t as t,Ft as n,Lt as r,Mn as i}from"./frappe-te-code-block.ts-BztFbm8z.js";var a=n({__name:`InsertVideo`,props:{editor:{}},setup(e){let n=e;function a(){n.editor.chain().focus().selectAndUploadVideo().run()}return(e,n)=>t(e.$slots,`default`,i(r({onClick:a})))}}),o=e({default:()=>s}),s=a;export{o as t};

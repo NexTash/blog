@@ -17,9 +17,9 @@
 			<div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
 				<!-- Brand -->
 				<router-link to="/" class="group max-w-2xl">
-					<p class="kicker mb-2">GUIDES & RESOURCES</p>
+					<!-- <p class="kicker mb-2">GUIDES & RESOURCES</p> -->
 					<h1
-						class="text-4xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318] md:text-6xl">
+						class="text-2xl md:text-2xl lg:text-3xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318]" style="font-weight:900">
 						LeadOrbitUSA
 					</h1>
 					<p class="mt-3 max-w-xl text-sm leading-6 text-[#b42318] md:text-base">
@@ -28,7 +28,8 @@
 				</router-link>
 
 				<!-- Guest actions -->
-				<div v-if="!auth?.isLoggedIn" class="flex flex-wrap items-center gap-3">
+				<div v-if="!auth?.isLoggedIn"
+					class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
 					<button @click="goToLogin" class="btn-secondary">Sign In</button>
 					<button @click="goToSignup" class="btn-primary">
 						<svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -41,8 +42,9 @@
 				</div>
 
 				<!-- Authenticated actions -->
-				<div v-else class="flex flex-col items-start gap-4 md:items-end">
-					<div class="flex flex-wrap items-center gap-3">
+				<div v-else class="flex w-full flex-col items-start gap-4 md:items-end">
+					<div
+						class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
 						<button v-if="isAdministrator" @click="goToBackendPosts" class="btn-secondary gap-1.5">
 							<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								stroke-width="2.5">

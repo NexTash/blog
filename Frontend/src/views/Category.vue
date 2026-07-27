@@ -68,7 +68,8 @@
 							:to="{ name: 'PostDetail', params: { name: post.name } }"
 							class="mt-auto inline-flex items-center gap-1 pt-5 text-xs font-black uppercase tracking-[0.16em] text-gray-900 transition-colors hover:text-[#b42318]"
 						>
-							Read Story <span aria-hidden="true">→</span>
+							Read More
+							 <!-- <span aria-hidden="true">→</span> -->
 						</router-link>
 					</div>
 				</article>
@@ -97,7 +98,7 @@
 					to="/"
 					class="mt-4 text-xs font-black uppercase tracking-[0.16em] text-[#b42318] hover:underline"
 				>
-					← Browse all stories
+					Browse all stories
 				</router-link>
 			</div>
 		</div>
