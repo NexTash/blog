@@ -22,7 +22,7 @@
                         </router-link>
                         <button @click="startFreshStory"
                             class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors">
-                            Draft Another Story
+                            Draft Another Blog
                         </button>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
                             class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-3">
                             <span>Blogger Workspace</span>
                             <span>/</span>
-                            <span class="text-black">{{ isEditing ? "Edit Story" : "New Story" }}</span>
+                            <span class="text-black">{{ isEditing ? "Edit Blog" : "New Blog" }}</span>
                         </nav>
                         <div class="flex items-center gap-4">
                             <h1 class="editorial-display text-3xl md:text-4xl font-bold tracking-tight text-black">
@@ -85,7 +85,7 @@
                                     @drop.prevent="handleImageDrop">
 
                                     <div v-if="imagePreview" class="h-full w-full">
-                                        <img :src="imagePreview" alt="Story Cover" class="h-full w-full object-cover" />
+                                        <img :src="imagePreview" alt="Blog Cover" class="h-full w-full object-cover" />
                                         <div
                                             class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button type="button" @click.stop="clearImage"
@@ -111,7 +111,7 @@
                                 <div
                                     class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-black transition-shadow">
                                     <label for="story-title"
-                                        class="mb-4 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">Story
+                                        class="mb-4 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">Blog
                                         Title</label>
                                     <input id="story-title" v-model="form.title" type="text"
                                         placeholder="Enter an engaging title..."
@@ -294,7 +294,7 @@
                                 <nav class="flex items-center gap-2 text-sm font-bold" aria-label="Preview Breadcrumb">
                                     <span class="text-[#b42318]">Home</span>
                                     <span class="text-gray-500" aria-hidden="true"> > </span>
-                                    <span class="truncate text-[#b42318]">{{ form.title || "Untitled Story" }}</span>
+                                    <span class="truncate text-[#b42318]">{{ form.title || "Untitled Blog" }}</span>
                                 </nav>
                             </div>
                         </div>
@@ -308,7 +308,7 @@
 
                                 <h1
                                     class="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-[34px] md:text-[38px]">
-                                    {{ form.title || "Untitled Story" }}
+                                    {{ form.title || "Untitled Blog" }}
                                 </h1>
 
                                 <div
@@ -457,14 +457,14 @@ const isEditingPublishedPost = computed(
 );
 const successTitle = computed(() => {
     if (!isEditing.value) {
-        return isSystemManager.value ? "Story Published!" : "Story Submitted!";
+        return isSystemManager.value ? "Blog Published!" : "Blog Submitted!";
     }
 
     if (isEditingPublishedPost.value && !isSystemManager.value) {
-        return "Story Resubmitted!";
+        return "Blog Resubmitted!";
     }
 
-    return isSystemManager.value ? "Published Changes Saved!" : "Story Updated!";
+    return isSystemManager.value ? "Published Changes Saved!" : "Blog Updated!";
 });
 const plainContent = computed(() => stripHtml(form.content));
 const isFormValid = computed(() => {
@@ -492,12 +492,12 @@ const hasPreviewSourcesSection = computed(
 
 const headerTitle = computed(() => {
     if (isEditing.value) {
-        if (isEditingPublishedPost.value) return "Edit Published Story";
+        if (isEditingPublishedPost.value) return "Edit Published Blog";
         if (currentPostStatus.value === "Submitted for Review") return "Edit Review Submission";
-        return "Edit Draft Story";
+        return "Edit Draft Blog";
     }
 
-    return "Create New Story";
+    return "Create New Blog";
 });
 
 // const sidebarListTitle = computed(() =>
@@ -732,7 +732,7 @@ const loadPostData = async (name) => {
         const post = await blogApi.getMyPendingPost(name);
         applyPostToForm(post);
     } catch (e) {
-        error.value = "Unable to load story.";
+        error.value = "Unable to load blog.";
     } finally {
         isLoadingCurrentPost.value = false;
     }

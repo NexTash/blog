@@ -3,7 +3,7 @@
 
 	<ErrorState
 		v-else-if="blogs.error && !blogs.data.length"
-		title="Could not load stories"
+		title="Could not load blogs"
 		:message="blogs.error"
 		@retry="fetchHome(true)"
 	/>
@@ -13,12 +13,12 @@
 		class="bg-[#f6f3ee] px-4 py-12"
 	>
 		<div class="surface mx-auto max-w-3xl px-6 py-16 text-center">
-			<p class="kicker">No Stories Yet</p>
+			<p class="kicker">No Blogs Yet</p>
 			<h2 class="mt-2 text-2xl font-black tracking-tight text-gray-900">
 				Nothing has been published yet.
 			</h2>
 			<p class="mt-3 text-sm leading-6 text-gray-500">
-				Once stories are approved, they will appear here.
+				Once blogs are approved, they will appear here.
 			</p>
 		</div>
 	</div>
@@ -26,7 +26,7 @@
 	<main v-else>
 		<ErrorState
 			v-if="blogs.error"
-			title="Stories may be out of date"
+			title="Blogs may be out of date"
 			:message="blogs.error"
 			@retry="fetchHome(true)"
 		/>

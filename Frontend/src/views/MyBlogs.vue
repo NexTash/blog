@@ -13,12 +13,12 @@
 							Everything you have submitted
 						</h1>
 						<p class="mt-4 max-w-2xl text-sm leading-7 text-white/75">
-							Track your published stories, return to drafts, and keep your author workflow in one place.
+							Track your published blogs, return to drafts, and keep your author workflow in one place.
 						</p>
 					</div>
 
 					<router-link to="/create-post" class="btn-primary shrink-0">
-						Write new story
+						Write new blog
 					</router-link>
 				</div>
 
@@ -84,7 +84,7 @@
 			>
 				<p class="kicker">Could Not Load</p>
 				<h2 class="text-2xl font-black tracking-tight text-gray-900">
-					We could not load your stories right now.
+					We could not load your blogs right now.
 				</h2>
 				<p class="text-sm leading-6 text-gray-600">{{ error }}</p>
 				<button class="btn-primary" type="button" @click="fetchPosts">Try again</button>
@@ -137,7 +137,7 @@
 								{{ post.blog_intro }}
 							</p>
 							<p v-else class="mt-3 text-sm leading-7 text-gray-400">
-								No introduction was added for this story yet.
+								No introduction was added for this blog yet.
 							</p>
 
 							<div class="mt-auto flex flex-wrap gap-3 pt-6">
@@ -153,7 +153,7 @@
 									:disabled="deletingPostName === post.name"
 									@click="deletePost(post)"
 								>
-									{{ deletingPostName === post.name ? "Deleting..." : "Delete story" }}
+									{{ deletingPostName === post.name ? "Deleting..." : "Delete blog" }}
 								</button>
 							</div>
 						</div>
@@ -167,12 +167,12 @@
 			>
 				<p class="kicker">{{ posts.length ? "No Match" : "No Blogs Yet" }}</p>
 				<h2 class="mt-3 text-3xl font-black tracking-tight text-gray-900">
-					{{ posts.length ? "No stories match your filters." : "Your stories will show up here." }}
+					{{ posts.length ? "No blogs match your filters." : "Your blogs will show up here." }}
 				</h2>
 				<p class="mt-3 text-sm leading-6 text-gray-500">
 					{{
 						posts.length
-							? "Try a different search or switch filters to find the story you need."
+							? "Try a different search or switch filters to find the blog you need."
 							: "Create your first blog post and come back here to manage it."
 					}}
 				</p>
@@ -186,7 +186,7 @@
 						Clear filters
 					</button>
 					<router-link to="/create-post" class="btn-primary">
-						Write new story
+						Write new blog
 					</router-link>
 				</div>
 			</div>
@@ -259,7 +259,7 @@ function primaryActionLink(post) {
 
 function primaryActionLabel(post) {
 	if (postStatus(post) === "Published") {
-		return "Edit published story";
+		return "Edit published blog";
 	}
 
 	if (postStatus(post) === "Submitted for Review") {
@@ -297,7 +297,7 @@ async function deletePost(post) {
 		await blogApi.deleteMyPendingPost(post.name);
 		posts.value = posts.value.filter((item) => item.name !== post.name);
 	} catch (err) {
-		error.value = err.message || "Unable to delete this story.";
+		error.value = err.message || "Unable to delete this blog.";
 	} finally {
 		deletingPostName.value = "";
 	}

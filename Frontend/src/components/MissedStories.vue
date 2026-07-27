@@ -70,7 +70,7 @@
 							d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" />
 					</svg>
 				</div>
-				<p class="text-sm font-semibold text-gray-500">More stories are on their way.</p>
+				<p class="text-sm font-semibold text-gray-500">More blogs are on their way.</p>
 			</div>
 		</div>
 	</section>

@@ -33,7 +33,7 @@
 defineProps({
 	title: {
 		type: String,
-		default: "Could not load stories",
+		default: "Could not load blogs",
 	},
 	message: {
 		type: String,

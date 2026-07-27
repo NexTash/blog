@@ -83,7 +83,7 @@
 			<!-- Empty state -->
 			<div v-else-if="!posts || posts.length === 0"
 				class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-20">
-				<p class="font-medium text-gray-500">No stories available yet.</p>
+				<p class="font-medium text-gray-500">No blogs available yet.</p>
 			</div>
 		</div>
 	</section>

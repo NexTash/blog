@@ -231,7 +231,7 @@ def _get_owned_post(post_name):
 
 	blogger_name = _require_blogger_for_session_user()
 	if post.blogger != blogger_name:
-		frappe.throw("You are not allowed to update this story.", frappe.PermissionError)
+		frappe.throw("You are not allowed to update this blog.", frappe.PermissionError)
 
 	return post
 
@@ -239,7 +239,7 @@ def _get_owned_post(post_name):
 def _get_owned_unpublished_post(post_name):
 	post = _get_owned_post(post_name)
 	if post.published:
-		frappe.throw("Published stories can only be edited from the backend.")
+		frappe.throw("Published blogs can only be edited from the backend.")
 	return post
 
 
@@ -427,9 +427,9 @@ def create_blog_post(
 		doc.db_set("meta_image", saved_file.file_url)
 
 	status_message = (
-		"Story published successfully."
+		"Blog published successfully."
 		if doc.published
-		else "Story submitted for review successfully."
+		else "Blog submitted for review successfully."
 	)
 
 	return {
@@ -514,11 +514,11 @@ def update_my_pending_post(
 	return {
 		"name": post.name,
 		"message": (
-			"Story published successfully."
+			"Blog published successfully."
 			if _get_post_status(post) == PUBLISHED_STATUS
-			else "Published story updated and resubmitted for review."
+			else "Published blog updated and resubmitted for review."
 			if was_published and _get_post_status(post) == REVIEW_STATUS
-			else "Story submitted for review successfully."
+			else "Blog submitted for review successfully."
 			if _get_post_status(post) == REVIEW_STATUS
 			else "Draft updated successfully."
 		),
@@ -603,7 +603,7 @@ def save_blog_draft(
 		"message": (
 			"Published changes saved successfully."
 			if name and post.published
-			else "Published story moved to review successfully."
+			else "Published blog moved to review successfully."
 			if name and not post.published and _get_post_status(post) == REVIEW_STATUS
 			else "Draft saved successfully."
 		),
@@ -872,7 +872,7 @@ def get_current_user_profile():
 @frappe.whitelist()
 def get_my_blogs():
 	if frappe.session.user == "Guest":
-		frappe.throw("Please log in to view your stories.", frappe.PermissionError)
+		frappe.throw("Please log in to view your blogs.", frappe.PermissionError)
 
 	blogger = _get_blogger_for_session_user()
 	if not blogger:
@@ -960,7 +960,7 @@ def send_emails_to_subscribers(blog_name):
         <p>A new article has just been published on our blog: <b>{blog.title}</b></p>
         <p>{blog.blog_intro or ''}</p>
         <a href="{blog_url}" style="padding: 10px 20px; background-color: #b42318; color: white; text-decoration: none; border-radius: 5px;">
-            Read Full Story
+            Read Full Blog
         </a>
         <br><br>
         <p>Best regards,<br>The NextNews Team</p>

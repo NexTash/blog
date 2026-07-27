@@ -9,7 +9,7 @@
 					Your Author Profile
 				</h1>
 				<p class="mt-4 max-w-2xl text-base leading-relaxed text-gray-600">
-					Review your account details, publishing activity, and latest stories from one centralized dashboard.
+					Review your account details, publishing activity, and latest blogs from one centralized dashboard.
 				</p>
 			</header>
 
@@ -110,7 +110,7 @@
 
 				<!-- Two Column Layout for Content -->
 				<div class="grid gap-8 lg:grid-cols-[1.5fr_0.8fr] lg:gap-12">
-					<!-- Left Column: Recent Stories -->
+					<!-- Left Column: Recent Blogs -->
 					<section class="surface rounded-3xl border border-[#e8e4db] bg-white p-6 shadow-sm md:p-10">
 						<div
 							class="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -119,15 +119,15 @@
 									Work</p>
 								<h2
 									class="editorial-display mt-2 text-2xl font-black tracking-tight text-gray-900 md:text-3xl">
-									Latest Stories
+									Latest Blogs
 								</h2>
 							</div>
 							<router-link to="/my-blogs" class="btn-secondary whitespace-nowrap text-sm">
-								View all stories
+								View all blogs
 							</router-link>
 						</div>
 
-						<!-- Stories List -->
+						<!-- Blogs List -->
 						<div v-if="profile.recent_posts.length" class="divide-y divide-gray-100">
 							<article v-for="post in profile.recent_posts" :key="post.name"
 								class="group flex flex-col gap-5 py-8 transition-all sm:flex-row sm:items-start sm:justify-between">
@@ -162,7 +162,7 @@
 									class="btn-secondary mt-2 w-full justify-center shrink-0 opacity-100 transition-opacity sm:mt-0 sm:w-auto lg:opacity-0 lg:group-hover:opacity-100">
 									{{
 										postStatus(post) === "Published"
-											? "Edit published story"
+											? "Edit published blog"
 											: postStatus(post) === "Submitted for Review"
 												? "Edit submission"
 												: "Edit draft"
@@ -178,13 +178,13 @@
 								class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f6f3ee] text-2xl text-gray-400">
 								✍️
 							</div>
-							<p class="editorial-display text-xl font-black tracking-tight text-gray-900">No stories yet
+							<p class="editorial-display text-xl font-black tracking-tight text-gray-900">No blogs yet
 							</p>
 							<p class="mt-2 max-w-sm text-sm leading-relaxed text-gray-500">
 								Start your first draft. Your published work and works-in-progress will appear here.
 							</p>
 							<router-link to="/create-post" class="btn-primary mt-6">
-								Write a story
+								Write a blog
 							</router-link>
 						</div>
 					</section>
@@ -198,7 +198,7 @@
 							<h2 class="editorial-display mt-2 text-xl font-black text-gray-900">Quick Actions</h2>
 							<div class="mt-6 flex flex-col gap-3">
 								<router-link to="/create-post" class="btn-primary flex justify-center py-3">
-									Write New Story
+									Write New Blog
 								</router-link>
 								<router-link to="/my-blogs" class="btn-secondary flex justify-center py-3">
 									Manage Content
@@ -253,7 +253,7 @@ const initial = computed(() => displayName.value.charAt(0).toUpperCase());
 const bioText = computed(
 	() =>
 		profile.value?.blogger?.bio ||
-		"This author account is ready to publish, edit, and manage stories from the blog dashboard.",
+		"This author account is ready to publish, edit, and manage blogs from the blog dashboard.",
 );
 const visibleRoles = computed(() => (profile.value?.roles || []).slice(0, 4));
 const avatarUrl = computed(() => {

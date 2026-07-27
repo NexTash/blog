@@ -69,7 +69,7 @@
 			<div v-if="isSearchOpen" class="absolute right-0 top-full z-50 w-full sm:right-4 sm:w-[460px]">
 				<div class="surface rounded-t-none p-4">
 					<div class="flex overflow-hidden rounded-md border border-gray-300 bg-white">
-						<input v-model="search" type="text" placeholder="Search stories…"
+						<input v-model="search" type="text" placeholder="Search blogs…"
 							class="w-full px-4 py-3 text-sm font-medium text-gray-700 outline-none" v-focus
 							@keydown.enter="doSearch" />
 						<button @click="doSearch"
@@ -97,7 +97,7 @@
 						</router-link>
 					</div>
 					<p v-else-if="search.trim().length > 1" class="mt-2 px-3 py-3 text-sm text-gray-400">
-						No stories found for "{{ search }}"
+						No blogs found for "{{ search }}"
 					</p>
 				</div>
 			</div>
