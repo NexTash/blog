@@ -147,6 +147,14 @@
 								>
 									{{ primaryActionLabel(post) }}
 								</router-link>
+								<button
+									type="button"
+									class="btn-secondary w-full justify-center border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800 sm:w-auto"
+									:disabled="deletingPostName === post.name"
+									@click="deletePost(post)"
+								>
+									{{ deletingPostName === post.name ? "Deleting..." : "Delete story" }}
+								</button>
 							</div>
 						</div>
 					</div>
@@ -196,6 +204,7 @@ const loading = ref(true);
 const error = ref("");
 const activeFilter = ref("all");
 const searchQuery = ref("");
+const deletingPostName = ref("");
 
 const filters = [
 	{ label: "All", value: "all" },
@@ -276,6 +285,21 @@ async function fetchPosts() {
 		posts.value = [];
 	} finally {
 		loading.value = false;
+	}
+}
+
+async function deletePost(post) {
+	if (!post?.name) return;
+	if (!window.confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+
+	deletingPostName.value = post.name;
+	try {
+		await blogApi.deleteMyPendingPost(post.name);
+		posts.value = posts.value.filter((item) => item.name !== post.name);
+	} catch (err) {
+		error.value = err.message || "Unable to delete this story.";
+	} finally {
+		deletingPostName.value = "";
 	}
 }
 

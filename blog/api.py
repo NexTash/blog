@@ -613,7 +613,7 @@ def save_blog_draft(
 
 @frappe.whitelist(methods=["POST"])
 def delete_my_pending_post(name):
-	post = _get_owned_unpublished_post(name)
+	post = _get_owned_post(name)
 	post_title = post.title or post.name
 	frappe.delete_doc("Blog Post", post.name, ignore_permissions=True)
 	return {
