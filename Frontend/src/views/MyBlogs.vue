@@ -147,6 +147,13 @@
 								>
 									{{ primaryActionLabel(post) }}
 								</router-link>
+								<router-link
+									v-if="postStatus(post) === 'Published'"
+									:to="viewPostLink(post)"
+									class="btn-secondary w-full justify-center sm:w-auto"
+								>
+									View post
+								</router-link>
 								<button
 									type="button"
 									class="btn-secondary w-full justify-center border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800 sm:w-auto"
@@ -255,6 +262,10 @@ const filteredPosts = computed(() => {
 
 function primaryActionLink(post) {
 	return { name: "CreatePost", params: { name: post.name } };
+}
+
+function viewPostLink(post) {
+	return { name: "PostDetail", params: { name: post.name } };
 }
 
 function primaryActionLabel(post) {

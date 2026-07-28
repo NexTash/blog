@@ -40,8 +40,9 @@ import {
 	LinkNofollowExtension,
 	isLinkNofollowActive,
 } from "../editor/extensions/LinkNofollowExtension";
+import { InlineCtaButtonExtension } from "../editor/extensions/InlineCtaButtonExtension";
 
-const editorExtensions = [LinkNofollowExtension];
+const editorExtensions = [LinkNofollowExtension, InlineCtaButtonExtension];
 
 const nofollowButton = {
 	label: "Toggle nofollow",
@@ -74,6 +75,20 @@ const faqButton = {
 				},
 				{ type: "paragraph" },
 			])
+			.run(),
+};
+
+const inlineCtaButton = {
+	label: "Insert draggable CTA block",
+	text: "CTA",
+	action: (editor) =>
+		editor
+			.chain()
+			.focus()
+			.insertInlineCtaButton({
+				label: "Call To Action",
+				url: "",
+			})
 			.run(),
 };
 
@@ -119,6 +134,7 @@ const editorButtons = computed(() => {
 		"Iframe",
 		"Separator",
 		"Horizontal Rule",
+		inlineCtaButton,
 		faqButton,
 		[
 			"InsertTable",

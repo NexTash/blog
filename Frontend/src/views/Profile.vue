@@ -158,16 +158,29 @@
 									</p>
 								</div>
 
-								<router-link :to="postLink(post)"
-									class="btn-secondary mt-2 w-full justify-center shrink-0 opacity-100 transition-opacity sm:mt-0 sm:w-auto lg:opacity-0 lg:group-hover:opacity-100">
-									{{
-										postStatus(post) === "Published"
-											? "Edit published blog"
-											: postStatus(post) === "Submitted for Review"
-												? "Edit submission"
-												: "Edit draft"
-									}}
-								</router-link>
+								<div
+									class="mt-2 flex w-full shrink-0 flex-wrap gap-3 opacity-100 transition-opacity sm:mt-0 sm:w-auto lg:opacity-0 lg:group-hover:opacity-100"
+								>
+									<router-link
+										v-if="postStatus(post) === 'Published'"
+										:to="viewPostLink(post)"
+										class="btn-secondary w-full justify-center sm:w-auto"
+									>
+										View post
+									</router-link>
+									<router-link
+										:to="postLink(post)"
+										class="btn-secondary w-full justify-center sm:w-auto"
+									>
+										{{
+											postStatus(post) === "Published"
+												? "Edit published blog"
+												: postStatus(post) === "Submitted for Review"
+													? "Edit submission"
+													: "Edit draft"
+										}}
+									</router-link>
+								</div>
 							</article>
 						</div>
 
@@ -264,6 +277,10 @@ const avatarUrl = computed(() => {
 
 function postLink(post) {
 	return { name: "CreatePost", params: { name: post.name } };
+}
+
+function viewPostLink(post) {
+	return { name: "PostDetail", params: { name: post.name } };
 }
 
 function postStatus(post) {

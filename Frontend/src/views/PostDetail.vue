@@ -57,19 +57,19 @@
 
 				<hr v-if="postData.blog_intro" class="my-10 border-gray-200" />
 
-				<div class="article-content" v-html="safeContent"></div>
+					<div class="article-content" v-html="safeContent"></div>
 
-				<div v-if="hasSourcesSection"
-					class="mt-12 rounded-xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
-					<div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-						<div class="min-w-0 flex-1">
+					<div v-if="hasSourcesSection"
+						class="mt-12 rounded-xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
+						<div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+							<div class="min-w-0 flex-1">
 						<h3
 							class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
 							Sources & Resources
 						</h3>
 						<ul v-if="safeBacklinks.length" class="space-y-4">
-							<li v-for="(link, index) in safeBacklinks" :key="index"
-								class="flex items-start gap-3 group">
+								<li v-for="(link, index) in safeBacklinks" :key="index"
+									class="flex items-start gap-3 group">
 								<svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
 									fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -78,20 +78,12 @@
 								<a :href="link.href" target="_blank" rel="noopener noreferrer"
 									class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
 									{{ link.label }}
-								</a>
-							</li>
-						</ul>
-						</div>
-						<div v-if="shouldShowCta"
-							class="shrink-0"
-							:class="safeBacklinks.length ? 'border-t border-gray-200 pt-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0' : ''">
-							<a :href="safeCtaButtonUrl" target="_blank" rel="noopener noreferrer nofollow"
-								class="inline-flex w-full items-center justify-center rounded-full bg-[#b42318] px-7 py-4 text-center text-xs font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#971b12] sm:w-auto">
-								Get Free Quote Now!
-							</a>
+									</a>
+								</li>
+							</ul>
+							</div>
 						</div>
 					</div>
-				</div>
 
 				<div class="mt-14 border-t border-gray-200 pt-8">
 					<button @click="$router.back()"
@@ -154,13 +146,6 @@ const loading = ref(true);
 const error = ref("");
 
 const safeContent = computed(() => sanitizeHtml(postData.value?.content));
-const safeCtaButtonUrl = computed(() => getSafeUrl(postData.value?.custom_cta_button_url));
-const shouldShowCta = computed(
-	() =>
-		Boolean(postData.value?.custom_cta_button_url) &&
-		safeCtaButtonUrl.value !== "#" &&
-		!postData.value?.hide_cta,
-);
 const safeBacklinks = computed(() =>
 	(postData.value?.custom_backlinks || [])
 		.map((link) => ({
@@ -169,9 +154,7 @@ const safeBacklinks = computed(() =>
 		}))
 		.filter((link) => link.href !== "#"),
 );
-const hasSourcesSection = computed(
-	() => safeBacklinks.value.length > 0 || shouldShowCta.value,
-);
+const hasSourcesSection = computed(() => safeBacklinks.value.length > 0);
 
 const fetchFullPost = async () => {
 	loading.value = true;
@@ -248,6 +231,54 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 
 .article-content a:hover {
 	color: #971b12;
+}
+
+.article-content .article-cta {
+	margin: 2rem 0;
+	display: flex;
+	justify-content: center;
+}
+
+.article-content .article-cta[data-align="left"] {
+	justify-content: flex-start;
+}
+
+.article-content .article-cta[data-align="right"] {
+	justify-content: flex-end;
+}
+
+.article-content .article-cta__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 9999px;
+	text-align: center;
+	font-weight: 900;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #fff;
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+}
+
+.article-content .article-cta[data-size="small"] .article-cta__button {
+	padding: 0.6rem 1rem;
+	font-size: 0.625rem;
+}
+
+.article-content .article-cta[data-size="medium"] .article-cta__button {
+	padding: 0.9rem 1.4rem;
+	font-size: 0.75rem;
+}
+
+.article-content .article-cta[data-size="large"] .article-cta__button {
+	padding: 1.15rem 2rem;
+	font-size: 0.875rem;
+}
+
+.article-content .article-cta__button:hover {
+	color: #fff;
+	filter: brightness(0.9);
 }
 
 .article-content img {

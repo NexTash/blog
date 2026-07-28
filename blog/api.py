@@ -65,10 +65,6 @@ def _blog_post_has_click_field():
 	return frappe.get_meta("Blog Post").has_field("custom_click_count")
 
 
-def _blog_post_has_cta_button_field():
-	return frappe.get_meta("Blog Post").has_field("custom_cta_button_url")
-
-
 def _blog_post_list_fields(*extra_fields):
 	fields = list(extra_fields)
 	if _blog_post_has_status_field():
@@ -102,37 +98,6 @@ def _get_post_click_count(post):
 		return int(getattr(post, "custom_click_count", 0) or 0)
 	except (TypeError, ValueError):
 		return 0
-
-
-def _normalize_cta_button_url(url):
-	normalized_url = str(url or "").strip()
-	if not normalized_url:
-		return ""
-
-	parsed_url = urlparse(normalized_url)
-	if parsed_url.scheme not in {"http", "https"} or not parsed_url.netloc:
-		frappe.throw("CTA button link must be a valid http:// or https:// URL.")
-
-	return normalized_url
-
-
-def _set_post_cta_button_url(target, url):
-	if not _blog_post_has_cta_button_field():
-		return
-
-	normalized_url = _normalize_cta_button_url(url)
-	if isinstance(target, dict):
-		target["custom_cta_button_url"] = normalized_url
-		return
-
-	target.custom_cta_button_url = normalized_url
-
-
-def _get_post_cta_button_url(post):
-	if not _blog_post_has_cta_button_field():
-		return ""
-
-	return str(getattr(post, "custom_cta_button_url", "") or "").strip()
 
 
 def _strip_legacy_cta_blocks(content):
@@ -257,7 +222,6 @@ def _serialize_post_for_editor(post):
 		"route": post.route,
 		"modified": post.modified,
 		"custom_click_count": _get_post_click_count(post),
-		"custom_cta_button_url": _get_post_cta_button_url(post),
 		"tags": [tag.strip() for tag in (post.custom_tags or "").split(",") if tag.strip()],
 		"backlinks": [
 			{
@@ -386,7 +350,6 @@ def create_blog_post(
 	tags=None,
 	backlinks=None,
 	status=None,
-	cta_button_url=None,
 ):
 	blogger_name = _require_blogger_for_session_user()
 	formatted_tags = _parse_tag_payload(tags)
@@ -410,8 +373,6 @@ def create_blog_post(
 		"route": _build_blog_post_route(title, category),
 	}
 	_set_post_status(post_values, resolved_status)
-	if is_system_manager:
-		_set_post_cta_button_url(post_values, cta_button_url)
 	doc = frappe.get_doc(post_values)
 	doc.insert()
 
@@ -478,7 +439,6 @@ def update_my_pending_post(
 	tags=None,
 	backlinks=None,
 	status=None,
-	cta_button_url=None,
 ):
 	post = _get_owned_post(name)
 	is_system_manager = _session_user_is_system_manager()
@@ -496,8 +456,6 @@ def update_my_pending_post(
 	post.set("custom_backlinks", [])
 	for backlink in _parse_backlinks_payload(backlinks):
 		post.append("custom_backlinks", backlink)
-	if is_system_manager:
-		_set_post_cta_button_url(post, cta_button_url)
 	post.save(ignore_permissions=True)
 
 	if frappe.request.files and "meta_image" in frappe.request.files:
@@ -535,7 +493,6 @@ def save_blog_draft(
 	category="Uncategorized",
 	tags=None,
 	backlinks=None,
-	cta_button_url=None,
 ):
 	resolved_title = _resolve_draft_title(title)
 
@@ -553,8 +510,6 @@ def save_blog_draft(
 		post.set("custom_backlinks", [])
 		for backlink in _parse_backlinks_payload(backlinks):
 			post.append("custom_backlinks", backlink)
-		if _session_user_is_system_manager():
-			_set_post_cta_button_url(post, cta_button_url)
 		if was_published:
 			if _session_user_is_system_manager():
 				post.published = 1
@@ -582,8 +537,6 @@ def save_blog_draft(
 				"route": _build_blog_post_route(resolved_title, category or "Uncategorized"),
 			}
 		_set_post_status(post_values, DRAFT_STATUS)
-		if _session_user_is_system_manager():
-			_set_post_cta_button_url(post_values, cta_button_url)
 		post = frappe.get_doc(post_values)
 		post.insert()
 

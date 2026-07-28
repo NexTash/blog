@@ -263,24 +263,6 @@
                                     </div>
                                 </div>
 
-                                <div v-if="isSystemManager"
-                                    class="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
-                                    <label for="cta-button-url"
-                                        class="mb-3 block text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">
-                                        CTA Button Link
-                                    </label>
-                                    <input id="cta-button-url" v-model="form.cta_button_url" type="url"
-                                        placeholder="https://example.com/get-quote"
-                                        class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors focus:border-black focus:ring-1 focus:ring-black" />
-                                    <!-- <p class="mt-3 text-xs leading-6 text-gray-500">
-                                        This link is used by the in-article
-                                        <span class="font-bold text-gray-700">CTA</span>
-                                        block and is editable only for
-                                        <span class="font-bold text-gray-700">System Manager</span>.
-                                    </p> -->
-                                </div>
-
-            
                             </div>
                         </aside>
                     </form>
@@ -363,18 +345,6 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        <div v-if="shouldShowPreviewCta"
-                                            class="shrink-0"
-                                            :class="previewBacklinks.length ? 'border-t border-gray-200 pt-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0' : ''">
-                                            <a
-                                                :href="safePreviewCtaButtonUrl"
-                                                target="_blank"
-                                                rel="noopener noreferrer nofollow"
-                                                class="inline-flex w-full items-center justify-center rounded-full bg-[#b42318] px-7 py-4 text-center text-xs font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#971b12] sm:w-auto"
-                                            >
-                                                Get Free Quote Now!
-                                            </a>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -447,7 +417,6 @@ const form = reactive({
     category: "",
     tags: [],
     backlinks: [],
-    cta_button_url: "",
 });
 
 const editingPostName = computed(() => route.params.name || "");
@@ -474,10 +443,6 @@ const isFormValid = computed(() => {
 });
 const wordCount = computed(() => plainContent.value.split(/\s+/).filter(Boolean).length);
 const previewContent = computed(() => sanitizeHtml(form.content));
-const safePreviewCtaButtonUrl = computed(() => getSafeUrl(form.cta_button_url));
-const shouldShowPreviewCta = computed(
-    () => Boolean(form.cta_button_url) && safePreviewCtaButtonUrl.value !== "#",
-);
 const previewBacklinks = computed(() =>
     form.backlinks
         .map((backlink) => ({
@@ -486,9 +451,7 @@ const previewBacklinks = computed(() =>
         }))
         .filter((backlink) => backlink.href !== "#"),
 );
-const hasPreviewSourcesSection = computed(
-    () => previewBacklinks.value.length > 0 || shouldShowPreviewCta.value,
-);
+const hasPreviewSourcesSection = computed(() => previewBacklinks.value.length > 0);
 
 const headerTitle = computed(() => {
     if (isEditing.value) {
@@ -586,7 +549,6 @@ function buildSubmitPayload() {
                 url: String(backlink?.url || "").trim(),
             }))
             .filter((backlink) => backlink.url),
-        cta_button_url: form.cta_button_url.trim(),
         meta_image: imageFile.value,
     };
 }
@@ -607,7 +569,6 @@ function applyPostToForm(post) {
             url: backlink?.url || "",
         }))
         : [];
-    form.cta_button_url = post.custom_cta_button_url || "";
     setImagePreview(post.meta_image ? getImageUrl(post.meta_image) : null);
     localSaveMessage.value = "";
 }
@@ -622,7 +583,6 @@ function resetComposerState() {
         category: categories.value[0]?.name || "",
         tags: [],
         backlinks: [],
-        cta_button_url: "",
     });
     clearImage();
     error.value = "";
@@ -916,6 +876,54 @@ onUnmounted(() => {
 
 .article-content h4 {
     font-size: 1.125rem;
+}
+
+.article-content .article-cta {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.article-content .article-cta[data-align="left"] {
+    justify-content: flex-start;
+}
+
+.article-content .article-cta[data-align="right"] {
+    justify-content: flex-end;
+}
+
+.article-content .article-cta__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    text-align: center;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.article-content .article-cta[data-size="small"] .article-cta__button {
+    padding: 0.6rem 1rem;
+    font-size: 0.625rem;
+}
+
+.article-content .article-cta[data-size="medium"] .article-cta__button {
+    padding: 0.9rem 1.4rem;
+    font-size: 0.75rem;
+}
+
+.article-content .article-cta[data-size="large"] .article-cta__button {
+    padding: 1.15rem 2rem;
+    font-size: 0.875rem;
+}
+
+.article-content .article-cta__button:hover {
+    color: #fff;
+    filter: brightness(0.9);
 }
 
 .article-content p {

@@ -51,6 +51,7 @@ export function sanitizeHtml(html, options = {}) {
 
 	removeLegacyCtaBlocks(template.content);
 	upgradeFaqAccordions(template.content);
+	normalizeInlineCtaBlocks(template.content);
 
 	return template.innerHTML;
 }
@@ -140,6 +141,56 @@ function upgradeFaqAccordions(root) {
 		details.append(summary, answer);
 		nextElement.remove();
 		node.replaceWith(details);
+	});
+}
+
+function normalizeInlineCtaBlocks(root) {
+	root.querySelectorAll('[data-type="inline-cta-button"]').forEach((node) => {
+		const label =
+			String(node.getAttribute("data-label") || node.querySelector("a")?.textContent || "").trim() ||
+			"Call To Action";
+		const href = getSafeUrl(
+			node.getAttribute("data-url") || node.querySelector("a")?.getAttribute("href") || "",
+		);
+		const align = String(node.getAttribute("data-align") || "center").toLowerCase();
+		const size = String(node.getAttribute("data-size") || "medium").toLowerCase();
+		const bgColor = String(node.getAttribute("data-bg-color") || "#b42318").trim() || "#b42318";
+		const wrapper = document.createElement("div");
+		wrapper.className = "article-cta article-cta--manual";
+		wrapper.setAttribute(
+			"data-align",
+			["left", "center", "right"].includes(align) ? align : "center",
+		);
+		wrapper.setAttribute(
+			"data-size",
+			["small", "medium", "large"].includes(size) ? size : "medium",
+		);
+		wrapper.setAttribute("data-label", label);
+		wrapper.setAttribute("data-url", href === "#" ? "" : href);
+		wrapper.setAttribute("data-bg-color", bgColor);
+
+		const link = document.createElement("a");
+		link.className = "article-cta__button";
+		link.textContent = label;
+		link.style.backgroundColor = bgColor;
+
+		if (href !== "#") {
+			link.href = href;
+			link.target = "_blank";
+			link.rel = "noopener noreferrer nofollow";
+		} else {
+			link.setAttribute("aria-disabled", "true");
+		}
+
+		wrapper.appendChild(link);
+
+		const replaceTarget =
+			node.parentElement?.tagName === "P" &&
+			node.parentElement.childNodes.length === 1
+				? node.parentElement
+				: node;
+
+		replaceTarget.replaceWith(wrapper);
 	});
 }
 
