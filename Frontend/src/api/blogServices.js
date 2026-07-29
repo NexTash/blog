@@ -1,5 +1,5 @@
 import { reactive } from "vue";
-import { postForm, postJson, request } from "./client";
+import { postForm, postJson, request, uploadFile } from "./client";
 
 const POST_EDITOR_TIMEOUT_MS = 60000;
 
@@ -146,6 +146,13 @@ export const blogApi = {
 
 	trackTraffic(payload) {
 		return postJson("blog.api.track_traffic", payload);
+	},
+
+	uploadImageFile(file) {
+		return uploadFile(file, {
+			folder: "Home/Attachments",
+			timeoutMs: POST_EDITOR_TIMEOUT_MS,
+		});
 	},
 };
 

@@ -113,3 +113,38 @@ export function postForm(path, formData, options = {}) {
 		body: formData,
 	});
 }
+
+export function uploadFile(file, options = {}) {
+	const {
+		isPrivate,
+		folder,
+		doctype,
+		docname,
+		fieldname,
+		...requestOptions
+	} = options;
+	const formData = new FormData();
+	formData.append("file", file, file.name);
+
+	if (isPrivate) {
+		formData.append("is_private", "1");
+	}
+
+	if (folder) {
+		formData.append("folder", folder);
+	}
+
+	if (doctype) {
+		formData.append("doctype", doctype);
+	}
+
+	if (docname) {
+		formData.append("docname", docname);
+	}
+
+	if (fieldname) {
+		formData.append("fieldname", fieldname);
+	}
+
+	return postForm("upload_file", formData, requestOptions);
+}

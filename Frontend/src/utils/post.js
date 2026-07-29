@@ -51,6 +51,7 @@ export function sanitizeHtml(html, options = {}) {
 
 	removeLegacyCtaBlocks(template.content);
 	upgradeFaqAccordions(template.content);
+	normalizeEditorialFeatureBlocks(template.content);
 	normalizeInlineCtaBlocks(template.content);
 
 	return template.innerHTML;
@@ -192,6 +193,132 @@ function normalizeInlineCtaBlocks(root) {
 
 		replaceTarget.replaceWith(wrapper);
 	});
+}
+
+function normalizeEditorialFeatureBlocks(root) {
+	root.querySelectorAll('[data-type="editorial-feature"]').forEach((node) => {
+		const title =
+			String(
+				node.getAttribute("data-title") ||
+					node.querySelector(".article-feature__headline")?.textContent ||
+					"",
+			).trim() || "Add section heading";
+		const rawBody = getEditorialFeatureBody(node) || "Add supporting copy here.";
+		const imageUrl = getSafeUrl(
+			node.getAttribute("data-image-url") ||
+				node.querySelector(".article-feature__image")?.getAttribute("src") ||
+				"",
+		);
+		const imageAlt = String(
+			node.getAttribute("data-image-alt") ||
+				node.querySelector(".article-feature__image")?.getAttribute("alt") ||
+				"",
+		).trim();
+		const caption = String(
+			node.getAttribute("data-caption") ||
+				node.querySelector(".article-feature__caption")?.textContent ||
+				"",
+		).trim();
+		const imagePosition = normalizeEditorialFeatureLayout(
+			node.getAttribute("data-layout") || node.getAttribute("data-image-position"),
+		);
+
+		const wrapper = document.createElement("div");
+		const classes = ["article-feature"];
+		if (imagePosition === "right") {
+			classes.push("article-feature--reverse");
+		}
+		if (imageUrl === "#") {
+			classes.push("article-feature--no-media");
+		}
+
+		wrapper.setAttribute("data-type", "editorial-feature");
+		wrapper.setAttribute("data-title", title);
+		wrapper.setAttribute("data-body", rawBody);
+		wrapper.setAttribute("data-image-url", imageUrl === "#" ? "" : imageUrl);
+		wrapper.setAttribute("data-image-alt", imageAlt);
+		wrapper.setAttribute("data-caption", caption);
+		wrapper.setAttribute("data-layout", imagePosition);
+		wrapper.className = classes.join(" ");
+
+		if (imageUrl !== "#") {
+			const figure = document.createElement("figure");
+			figure.className = "article-feature__media";
+
+			const image = document.createElement("img");
+			image.className = "article-feature__image";
+			image.src = imageUrl;
+			image.alt = imageAlt;
+			figure.appendChild(image);
+
+			if (caption) {
+				const figcaption = document.createElement("figcaption");
+				figcaption.className = "article-feature__caption";
+				figcaption.textContent = caption;
+				figure.appendChild(figcaption);
+			}
+
+			wrapper.appendChild(figure);
+		}
+
+		const content = document.createElement("div");
+		content.className = "article-feature__content";
+
+		const headline = document.createElement("h3");
+		headline.className = "article-feature__headline";
+		headline.textContent = title;
+		content.appendChild(headline);
+
+		const body = document.createElement("div");
+		body.className = "article-feature__body";
+
+		splitEditorialFeatureParagraphs(rawBody).forEach((paragraphText) => {
+			const paragraph = document.createElement("p");
+			paragraph.textContent = paragraphText;
+			body.appendChild(paragraph);
+		});
+
+		content.appendChild(body);
+		wrapper.appendChild(content);
+
+		node.replaceWith(wrapper);
+	});
+}
+
+function getEditorialFeatureBody(node) {
+	const bodyFromAttribute = String(node.getAttribute("data-body") || "").trim();
+	if (bodyFromAttribute) {
+		return bodyFromAttribute;
+	}
+
+	const bodyContainer = node.querySelector(".article-feature__body");
+	if (!bodyContainer) {
+		return "";
+	}
+
+	const paragraphs = [...bodyContainer.querySelectorAll("p")]
+		.map((paragraph) => (paragraph.textContent || "").trim())
+		.filter(Boolean);
+
+	if (paragraphs.length) {
+		return paragraphs.join("\n\n");
+	}
+
+	return (bodyContainer.textContent || "").trim();
+}
+
+function splitEditorialFeatureParagraphs(body) {
+	const paragraphs = String(body || "")
+		.split(/\n\s*\n/g)
+		.map((paragraph) => paragraph.trim())
+		.filter(Boolean);
+
+	return paragraphs.length ? paragraphs : ["Add supporting copy here."];
+}
+
+function normalizeEditorialFeatureLayout(value) {
+	const layout = String(value || "left").toLowerCase();
+	return ["left", "right"].includes(layout) ? layout : "left";
 }
 
 export function formatDate(

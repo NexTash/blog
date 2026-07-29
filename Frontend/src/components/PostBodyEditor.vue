@@ -41,8 +41,26 @@ import {
 	isLinkNofollowActive,
 } from "../editor/extensions/LinkNofollowExtension";
 import { InlineCtaButtonExtension } from "../editor/extensions/InlineCtaButtonExtension";
+import { EditorialFeatureExtension } from "../editor/extensions/EditorialFeatureExtension";
 
-const editorExtensions = [LinkNofollowExtension, InlineCtaButtonExtension];
+const editorExtensions = [LinkNofollowExtension, InlineCtaButtonExtension, EditorialFeatureExtension];
+
+const FONT_SIZE_OPTIONS = [
+	{ label: "Body", value: null },
+	{ label: "Small", value: "0.875rem" },
+	{ label: "Base", value: "1rem" },
+	{ label: "Large", value: "1.125rem" },
+	{ label: "XL", value: "1.25rem" },
+	{ label: "2XL", value: "1.5rem" },
+];
+
+function normalizeFontSize(value) {
+	return String(value || "").trim().toLowerCase();
+}
+
+function getActiveFontSize(editor) {
+	return normalizeFontSize(editor?.getAttributes?.("textStyle")?.fontSize);
+}
 
 const nofollowButton = {
 	label: "Toggle nofollow",
@@ -92,6 +110,40 @@ const inlineCtaButton = {
 			.run(),
 };
 
+const editorialFeatureButton = {
+	label: "Insert editorial image-text feature block",
+	text: "Feature",
+	action: (editor) =>
+		editor
+			.chain()
+			.focus()
+			.insertEditorialFeature({
+				title: "Add section heading",
+				body: "Add supporting copy here.",
+				imageUrl: "",
+				imageAlt: "",
+				caption: "",
+				imagePosition: "left",
+			})
+			.run(),
+};
+
+const fontSizeButtons = FONT_SIZE_OPTIONS.map((option) => ({
+	label: option.label,
+	text: option.label,
+	action: (editor) => {
+		if (option.value) {
+			return editor.chain().focus().setFontSize(option.value).run();
+		}
+
+		return editor.chain().focus().unsetFontSize().run();
+	},
+	isActive: (editor) =>
+		option.value
+			? getActiveFontSize(editor) === normalizeFontSize(option.value)
+			: !getActiveFontSize(editor),
+}));
+
 defineProps({
 	modelValue: {
 		type: String,
@@ -111,6 +163,7 @@ const editorButtons = computed(() => {
 	const buttons = [
 		"Paragraph",
 		["Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+		fontSizeButtons,
 		"Separator",
 		"Bold",
 		"Italic",
@@ -134,6 +187,7 @@ const editorButtons = computed(() => {
 		"Iframe",
 		"Separator",
 		"Horizontal Rule",
+		editorialFeatureButton,
 		inlineCtaButton,
 		faqButton,
 		[

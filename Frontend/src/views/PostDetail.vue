@@ -245,6 +245,64 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	margin: 1.25rem 0;
 }
 
+.article-content .article-feature {
+	margin: 2.5rem 0;
+	display: grid;
+	gap: 1.5rem;
+	align-items: start;
+}
+
+.article-content .article-feature--no-media {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.article-content .article-feature__media {
+	margin: 0;
+}
+
+.article-content .article-feature__image {
+	margin: 0;
+	width: 100%;
+	aspect-ratio: 5 / 4;
+	object-fit: cover;
+	border-radius: 1.5rem;
+	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+.article-content .article-feature__caption {
+	margin-top: 0.85rem;
+	text-align: center;
+	font-size: 0.95rem;
+	font-weight: 900;
+	line-height: 1.4;
+	color: #46362a;
+}
+
+.article-content .article-feature__content {
+	min-width: 0;
+	align-self: center;
+}
+
+.article-content .article-feature__headline {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	font-size: clamp(1.85rem, 1.2rem + 1.8vw, 2.7rem);
+	line-height: 1.12;
+	letter-spacing: -0.03em;
+}
+
+.article-content .article-feature__body {
+	color: #334155;
+}
+
+.article-content .article-feature__body p {
+	margin: 0 0 1rem;
+}
+
+.article-content .article-feature__body p:last-child {
+	margin-bottom: 0;
+}
+
 .article-content a {
 	color: #b42318;
 	text-decoration: underline;
@@ -440,5 +498,19 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 .article-content th {
 	background: #f8fafc;
 	font-weight: 700;
+}
+
+@media (min-width: 768px) {
+	.article-content .article-feature {
+		grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+	}
+
+	.article-content .article-feature--reverse .article-feature__media {
+		order: 2;
+	}
+
+	.article-content .article-feature--reverse .article-feature__content {
+		order: 1;
+	}
 }
 </style>

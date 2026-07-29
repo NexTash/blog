@@ -68,7 +68,8 @@
                     <form @submit.prevent="handleSubmit" class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
 
                         <!-- MAIN CONTENT AREA -->
-                        <div class="space-y-6">
+                        <div class="space-y-6 min-w-0">
+
                             <div v-if="isLoadingCurrentPost"
                                 class="bg-white rounded-2xl p-20 text-center border border-gray-200 flex flex-col items-center justify-center space-y-4">
                                 <div class="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin">
@@ -136,7 +137,7 @@
                         </div>
 
                         <!-- SIDEBAR -->
-                        <aside class="space-y-6">
+                        <aside class="space-y-6 min-w-0">
                             <div class="flex flex-col gap-6 lg:sticky lg:top-8">
 
                                 <!-- Publishing Actions -->
@@ -335,7 +336,8 @@
                                                     class="flex items-start gap-3 group">
                                                     <svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                     </svg>
                                                     <a :href="link.href" target="_blank" rel="noopener noreferrer"
