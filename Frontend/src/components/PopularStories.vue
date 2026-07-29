@@ -16,7 +16,7 @@
 
 			<div v-if="popularPosts.length" class="grid grid-cols-1 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
 				<article v-for="(post, i) in popularPosts" :key="post.name"
-					class="group relative px-0 sm:px-6 lg:border-r lg:border-gray-200 last:border-r-0">
+					class="group relative h-full px-0 sm:px-6 lg:border-r lg:border-gray-200 last:border-r-0">
 					<!-- Rank Number (Graphic Element) -->
 					<div class="absolute -top-6 left-0 z-0 select-none overflow-hidden sm:-top-8 sm:left-4">
 						<span
@@ -26,7 +26,7 @@
 					</div>
 
 					<!-- Content Wrapper -->
-					<div class="relative z-10 pt-4">
+					<div class="relative z-10 flex min-h-[16.5rem] flex-col pt-4">
 						<!-- Category with dot accent -->
 						<div class="flex items-center gap-2 mb-4">
 							<span class="h-1.5 w-1.5 rounded-full bg-[#b42318]"></span>
@@ -37,13 +37,13 @@
 
 						<router-link :to="{ name: 'PostDetail', params: { name: post.name } }">
 							<h3
-								class="mb-4 line-clamp-3 text-xl font-extrabold leading-[1.3] text-gray-900 transition-colors group-hover:text-[#b42318]">
+								class="min-h-[4.9rem] text-xl font-extrabold leading-[1.3] text-gray-900 transition-colors group-hover:text-[#b42318]">
 								{{ post.title }}
 							</h3>
 						</router-link>
 
 						<!-- Metadata -->
-						<div class="mt-6 flex flex-col gap-1">
+						<div class="mt-auto flex flex-col gap-1 pt-6">
 							<span class="text-[11px] font-bold uppercase tracking-widest text-gray-400">
 								By {{ post.blogger || "Admin" }}
 							</span>

@@ -1,5 +1,7 @@
 import { reactive } from "vue";
-import { getResource, postForm, postJson, request } from "./client";
+import { postForm, postJson, request } from "./client";
+
+const POST_EDITOR_TIMEOUT_MS = 60000;
 
 function createCachedResource(loader) {
 	return reactive({
@@ -42,7 +44,7 @@ export const blogApi = {
 	},
 
 	getPost(name) {
-		return getResource("Blog Post", name);
+		return request(`blog.api.get_published_post?name=${encodeURIComponent(name)}`);
 	},
 
 	recordPostClick(name) {
@@ -76,7 +78,9 @@ export const blogApi = {
 			formData.append("meta_image", payload.meta_image);
 		}
 
-		return postForm("blog.api.create_blog_post", formData);
+		return postForm("blog.api.create_blog_post", formData, {
+			timeoutMs: POST_EDITOR_TIMEOUT_MS,
+		});
 	},
 
 	saveDraft(payload) {
@@ -98,7 +102,9 @@ export const blogApi = {
 			formData.append("meta_image", payload.meta_image);
 		}
 
-		return postForm("blog.api.save_blog_draft", formData);
+		return postForm("blog.api.save_blog_draft", formData, {
+			timeoutMs: POST_EDITOR_TIMEOUT_MS,
+		});
 	},
 
 	getMyPendingPosts() {
@@ -129,7 +135,9 @@ export const blogApi = {
 			formData.append("meta_image", payload.meta_image);
 		}
 
-		return postForm("blog.api.update_my_pending_post", formData);
+		return postForm("blog.api.update_my_pending_post", formData, {
+			timeoutMs: POST_EDITOR_TIMEOUT_MS,
+		});
 	},
 
 	deleteMyPendingPost(name) {

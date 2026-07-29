@@ -51,11 +51,12 @@ function getTimeoutMessage() {
 }
 
 async function fetchWithTimeout(url, options = {}) {
+	const { timeoutMs = REQUEST_TIMEOUT_MS, ...fetchOptions } = options;
 	const controller = new AbortController();
-	const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+	const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
 	try {
-		return await fetch(url, { ...options, signal: controller.signal });
+		return await fetch(url, { ...fetchOptions, signal: controller.signal });
 	} catch (error) {
 		if (error.name === "AbortError") {
 			throw new ApiError(getTimeoutMessage(), null, null);
@@ -90,8 +91,9 @@ export async function getResource(doctype, name) {
 	return payload?.data ?? null;
 }
 
-export function postJson(path, body) {
+export function postJson(path, body, options = {}) {
 	return request(path, {
+		...options,
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -101,8 +103,9 @@ export function postJson(path, body) {
 	});
 }
 
-export function postForm(path, formData) {
+export function postForm(path, formData, options = {}) {
 	return request(path, {
+		...options,
 		method: "POST",
 		headers: {
 			"X-Frappe-CSRF-Token": getCsrfToken(),

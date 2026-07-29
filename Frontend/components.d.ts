@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdPosts: typeof import('./src/components/AdPosts.vue')['default']
+    AuthorPostCard: typeof import('./src/components/AuthorPostCard.vue')['default']
     ErrorState: typeof import('./src/components/ErrorState.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']

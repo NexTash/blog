@@ -204,17 +204,34 @@ def _get_owned_post(post_name):
 def _get_owned_unpublished_post(post_name):
 	post = _get_owned_post(post_name)
 	if post.published:
+		frappe.throw("Published blogs can only be managed from the backend.")
+	return post
+
+
+def _get_owned_post_for_public_editor(post_name):
+	post = _get_owned_post(post_name)
+	if post.published and not _session_user_is_system_manager():
 		frappe.throw("Published blogs can only be edited from the backend.")
 	return post
 
 
 def _serialize_post_for_editor(post):
+	backlinks = [
+		{
+			"label": getattr(row, "link_label", "") or "",
+			"url": row.link_of_original_source,
+		}
+		for row in (post.custom_backlinks or [])
+		if row.link_of_original_source
+	]
+
 	return {
 		"name": post.name,
 		"title": post.title,
 		"blog_intro": post.blog_intro or "",
 		"content": post.content or "",
 		"blog_category": post.blog_category,
+		"blogger": post.blogger,
 		"published": post.published,
 		"custom_post_status": _get_post_status(post, fallback=DRAFT_STATUS),
 		"published_on": post.published_on,
@@ -223,13 +240,13 @@ def _serialize_post_for_editor(post):
 		"modified": post.modified,
 		"custom_click_count": _get_post_click_count(post),
 		"tags": [tag.strip() for tag in (post.custom_tags or "").split(",") if tag.strip()],
-		"backlinks": [
+		"backlinks": backlinks,
+		"custom_backlinks": [
 			{
-				"label": getattr(row, "link_label", "") or "",
-				"url": row.link_of_original_source,
+				"link_label": backlink["label"],
+				"link_of_original_source": backlink["url"],
 			}
-			for row in (post.custom_backlinks or [])
-			if row.link_of_original_source
+			for backlink in backlinks
 		],
 	}
 
@@ -269,7 +286,7 @@ def request_password_reset(user):
 
 		if key:
 			website_link = get_url(
-				f"/Frontend/reset-password?key={key}",
+				f"/reset-password?key={key}",
 				allow_header_override=False,
 			)
 			user_doc.password_reset_mail(website_link)
@@ -425,7 +442,7 @@ def get_my_pending_posts():
 
 @frappe.whitelist()
 def get_my_pending_post(name):
-	post = _get_owned_post(name)
+	post = _get_owned_post_for_public_editor(name)
 	return _serialize_post_for_editor(post)
 
 
@@ -440,7 +457,7 @@ def update_my_pending_post(
 	backlinks=None,
 	status=None,
 ):
-	post = _get_owned_post(name)
+	post = _get_owned_post_for_public_editor(name)
 	is_system_manager = _session_user_is_system_manager()
 	was_published = bool(post.published)
 	content = _strip_legacy_cta_blocks(content)
@@ -497,7 +514,7 @@ def save_blog_draft(
 	resolved_title = _resolve_draft_title(title)
 
 	if name:
-		post = _get_owned_post(name)
+		post = _get_owned_post_for_public_editor(name)
 		was_published = bool(post.published)
 		content = _strip_legacy_cta_blocks(content)
 		post.title = _resolve_draft_title(title, post.title)
@@ -566,7 +583,7 @@ def save_blog_draft(
 
 @frappe.whitelist(methods=["POST"])
 def delete_my_pending_post(name):
-	post = _get_owned_post(name)
+	post = _get_owned_unpublished_post(name)
 	post_title = post.title or post.name
 	frappe.delete_doc("Blog Post", post.name, ignore_permissions=True)
 	return {
@@ -579,7 +596,18 @@ def delete_my_pending_post(name):
 def get_context():
 	posts = frappe.get_list(
 		"Blog Post",
-		fields=["*"],
+		fields=_blog_post_list_fields(
+			"name",
+			"title",
+			"blog_intro",
+			"blog_category",
+			"blogger",
+			"published",
+			"published_on",
+			"modified",
+			"meta_image",
+			"route",
+		),
 		order_by="published_on desc, name asc",
 		filters={"published": 1},
 	)
@@ -614,6 +642,19 @@ def record_post_click(name):
 	click_count = frappe.db.get_value("Blog Post", post_name, "custom_click_count") or 0
 
 	return {"name": post_name, "click_count": int(click_count)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_published_post(name):
+	if not name:
+		frappe.throw("Post name is required.")
+
+	post_name = frappe.db.get_value("Blog Post", {"name": name, "published": 1}, "name")
+	if not post_name:
+		frappe.throw("Published post not found.", frappe.DoesNotExistError)
+
+	post = frappe.get_doc("Blog Post", post_name)
+	return _serialize_post_for_editor(post)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -892,8 +933,6 @@ def notify_subscribers_on_publish(doc, method=None):
                 timeout=1500,
                 blog_name=doc.name
             )
-            
-            doc.db_set("custom_email_sent_to_subscribers", 1, update_modified=False)
 
 
 def send_emails_to_subscribers(blog_name):
@@ -927,3 +966,4 @@ def send_emails_to_subscribers(blog_name):
         subject=subject,
         content=message
     )
+    blog.db_set("custom_email_sent_to_subscribers", 1, update_modified=False)

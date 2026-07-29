@@ -20,6 +20,7 @@ export default [
 	},
 	{
 		path: "/reset-password",
+		alias: "/Frontend/reset-password",
 		name: "ResetPassword",
 		component: () => import("../views/ResetPassword.vue"),
 	},

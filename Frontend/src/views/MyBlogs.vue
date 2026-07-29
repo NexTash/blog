@@ -1,199 +1,131 @@
 <template>
-	<main class="min-h-screen bg-[#f6f3ee] px-4 py-10 md:px-6 md:py-14">
-		<div class="mx-auto max-w-7xl">
-			<section
-				class="overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#111827] via-[#1f2937] to-[#7f1d1d] px-6 py-8 text-white shadow-[0_30px_90px_rgba(15,23,42,0.20)] md:px-8 md:py-10"
-			>
-				<div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-					<div class="max-w-3xl">
-						<p class="text-xs font-black uppercase tracking-[0.22em] text-[#fca5a5]">
-							My Blogs
-						</p>
-						<h1 class="mt-3 text-4xl font-black tracking-tight md:text-5xl">
-							Everything you have submitted
-						</h1>
-						<p class="mt-4 max-w-2xl text-sm leading-7 text-white/75">
-							Track your published blogs, return to drafts, and keep your author workflow in one place.
-						</p>
-					</div>
+	<main class="min-h-screen bg-[#f6f3ee] selection:bg-[#b42318] selection:text-white overflow-y-auto">
+		<div class="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-20">
 
-					<router-link to="/create-post" class="btn-primary shrink-0">
-						Write new blog
-					</router-link>
+			<!-- Header / Dashboard Hero -->
+			<section class="relative overflow-hidden rounded-[2.5rem] bg-gray-900 text-white shadow-2xl">
+				<!-- Background Texture & Decorative Gradients -->
+				<div
+					class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10">
+				</div>
+				<div class="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-[#b42318] opacity-10 blur-[100px]">
 				</div>
 
-				<div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-					<div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-						<p class="text-xs font-black uppercase tracking-[0.18em] text-white/60">Total</p>
-						<p class="mt-3 text-4xl font-black">{{ posts.length }}</p>
+				<div class="relative px-6 py-10 md:px-12 md:py-16">
+					<div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
+						<div class="max-w-3xl space-y-4">
+							<p
+								class="inline-block bg-[#b42318] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+								Editorial Archive
+							</p>
+							<h1 class="editorial-display text-4xl font-black tracking-tight md:text-6xl">
+								Your Publications<span class="text-[#b42318]">.</span>
+							</h1>
+							<p class="max-w-xl text-sm leading-relaxed text-white/60">
+								Manage your literary portfolio. Track performance, refine drafts, and oversee the
+								editorial lifecycle.
+							</p>
+						</div>
+
+						<router-link to="/create-post"
+							class="group flex items-center justify-center gap-3 bg-white px-8 py-4 text-[11px] font-black uppercase tracking-widest text-gray-900 transition-all hover:bg-[#b42318] hover:text-white">
+							Write New Entry
+							<span class="transition-transform group-hover:translate-x-1">→</span>
+						</router-link>
 					</div>
-					<div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-						<p class="text-xs font-black uppercase tracking-[0.18em] text-white/60">Published</p>
-						<p class="mt-3 text-4xl font-black">{{ publishedCount }}</p>
-					</div>
-					<div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-						<p class="text-xs font-black uppercase tracking-[0.18em] text-white/60">Drafts</p>
-						<p class="mt-3 text-4xl font-black">{{ draftCount }}</p>
-					</div>
-					<div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-						<p class="text-xs font-black uppercase tracking-[0.18em] text-white/60">In Review</p>
-						<p class="mt-3 text-4xl font-black">{{ reviewCount }}</p>
+
+					<!-- Stats Mini-Grid -->
+					<div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<div v-for="(val, label) in statsMap" :key="label"
+							class="border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-colors hover:bg-white/10">
+							<p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">{{ label }}</p>
+							<p class="editorial-display mt-2 text-3xl font-bold text-white">{{ val }}</p>
+						</div>
 					</div>
 				</div>
 			</section>
 
-			<section class="mt-8 surface p-5 md:p-6">
-				<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-					<div class="flex flex-wrap gap-2">
-						<button
-							v-for="option in filters"
-							:key="option.value"
-							type="button"
-							class="rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] transition-colors"
-							:class="
-								activeFilter === option.value
-									? 'border-[#b42318] bg-[#b42318] text-white'
-									: 'border-gray-200 bg-white text-gray-700 hover:border-[#b42318] hover:text-[#b42318]'
-							"
-							@click="activeFilter = option.value"
-						>
+			<!-- Control Bar: Search & Filters -->
+			<section
+				class="sticky top-6 z-30 mt-10 rounded-2xl border border-gray-900/5 bg-white/80 p-4 shadow-xl shadow-gray-200/50 backdrop-blur-xl md:p-6">
+				<div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+					<!-- Filter Tabs -->
+					<div class="flex flex-wrap gap-1">
+						<button v-for="option in filters" :key="option.value" @click="activeFilter = option.value"
+							class="px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all" :class="activeFilter === option.value
+								? 'bg-gray-900 text-white shadow-lg'
+								: 'text-gray-400 hover:text-gray-900'">
 							{{ option.label }}
 						</button>
 					</div>
 
-					<label class="relative block w-full max-w-md">
-						<span class="sr-only">Search your blogs</span>
-						<input
-							v-model.trim="searchQuery"
-							type="search"
-							placeholder="Search by title or category"
-							class="w-full rounded-2xl border border-gray-200 bg-[#f8f6f2] px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#b42318] focus:bg-white"
-						/>
-					</label>
+					<!-- Search -->
+					<div class="relative w-full max-w-md">
+						<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+								stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+									d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+							</svg>
+						</span>
+						<input v-model.trim="searchQuery" type="search" placeholder="Search archives..."
+							class="w-full border-none bg-[#f6f3ee] py-3 pl-11 pr-4 text-xs font-bold uppercase tracking-widest text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#b42318]/20 transition-all outline-none" />
+					</div>
 				</div>
 			</section>
 
-			<div v-if="loading" class="flex flex-col items-center justify-center py-24">
-				<div class="h-10 w-10 animate-spin rounded-full border-b-2 border-[#b42318]"></div>
-				<p class="mt-4 text-sm font-medium text-gray-400">Loading your blogs...</p>
+			<!-- Loading State -->
+			<div v-if="loading" class="flex flex-col items-center justify-center py-40">
+				<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-[#b42318]"></div>
+				<p class="mt-6 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Syncing Archives</p>
 			</div>
 
 			<div
 				v-else-if="error"
-				class="surface mt-8 flex flex-col items-start gap-4 px-6 py-8 md:px-8"
+				class="surface mt-12 flex flex-col items-start gap-4 rounded-[2rem] px-6 py-8 md:px-8"
 			>
-				<p class="kicker">Could Not Load</p>
-				<h2 class="text-2xl font-black tracking-tight text-gray-900">
-					We could not load your blogs right now.
-				</h2>
-				<p class="text-sm leading-6 text-gray-600">{{ error }}</p>
+				<p class="kicker text-[11px]">Could Not Load</p>
+				<h2 class="editorial-display text-3xl font-black text-gray-900">Your archive is unavailable.</h2>
+				<p class="max-w-2xl text-sm leading-6 text-gray-600">{{ error }}</p>
 				<button class="btn-primary" type="button" @click="fetchPosts">Try again</button>
 			</div>
 
-			<div
-				v-else-if="filteredPosts.length"
-				class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2"
-			>
-				<article
-					v-for="post in filteredPosts"
-					:key="post.name"
-					class="surface group overflow-hidden"
-				>
-					<div class="grid h-full md:grid-cols-[220px_1fr]">
-						<div class="relative min-h-[220px] overflow-hidden bg-gray-900">
-							<img
-								:src="getImageUrl(post.meta_image)"
-								:alt="post.title"
-								class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-							/>
-							<div class="absolute left-4 top-4 flex flex-wrap gap-2">
-								<span
-									class="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]"
-									:class="statusBadgeClass(post)"
-								>
-									{{ postStatus(post) }}
-								</span>
-								<span class="story-chip bg-white text-gray-900 shadow-none">
-									{{ post.blog_category || "General" }}
-								</span>
-							</div>
-						</div>
+			<!-- Blog Grid -->
+				<div v-else-if="filteredPosts.length" class="mt-12 grid grid-cols-1 gap-10 xl:grid-cols-2">
+					<AuthorPostCard
+						v-for="post in filteredPosts"
+						:key="post.name"
+						:post="post"
+						:edit-to="primaryActionLink(post)"
+						:view-to="viewPostLink(post)"
+						:edit-label="primaryActionLabel(post)"
+						:show-delete="canDeletePost(post)"
+						:deleting="deletingPostName === post.name"
+						@delete="deletePost(post)"
+					/>
+				</div>
 
-						<div class="flex min-h-[220px] flex-col p-6">
-							<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">
-								<span>
-									{{ postStatus(post) === "Published" ? "Published" : "Updated" }}
-									{{ formatDate(post.published ? post.published_on : post.modified) }}
-								</span>
-								<!-- <span aria-hidden="true">|</span>
-								<span>{{ post.name }}</span> -->
-							</div>
-
-							<h2 class="mt-4 text-2xl font-black leading-tight tracking-tight text-gray-900">
-								{{ post.title }}
-							</h2>
-
-							<p v-if="post.blog_intro" class="mt-3 line-clamp-4 text-sm leading-7 text-gray-600">
-								{{ post.blog_intro }}
-							</p>
-							<p v-else class="mt-3 text-sm leading-7 text-gray-400">
-								No introduction was added for this blog yet.
-							</p>
-
-							<div class="mt-auto flex flex-wrap gap-3 pt-6">
-								<router-link
-									:to="primaryActionLink(post)"
-									class="btn-primary w-full justify-center sm:w-auto"
-								>
-									{{ primaryActionLabel(post) }}
-								</router-link>
-								<router-link
-									v-if="postStatus(post) === 'Published'"
-									:to="viewPostLink(post)"
-									class="btn-secondary w-full justify-center sm:w-auto"
-								>
-									View post
-								</router-link>
-								<button
-									type="button"
-									class="btn-secondary w-full justify-center border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800 sm:w-auto"
-									:disabled="deletingPostName === post.name"
-									@click="deletePost(post)"
-								>
-									{{ deletingPostName === post.name ? "Deleting..." : "Delete blog" }}
-								</button>
-							</div>
-						</div>
-					</div>
-				</article>
-			</div>
-
-			<div
-				v-else
-				class="surface mt-8 rounded-[2rem] border border-dashed border-gray-300 bg-white px-6 py-16 text-center"
-			>
-				<p class="kicker">{{ posts.length ? "No Match" : "No Blogs Yet" }}</p>
-				<h2 class="mt-3 text-3xl font-black tracking-tight text-gray-900">
-					{{ posts.length ? "No blogs match your filters." : "Your blogs will show up here." }}
+			<!-- Empty State -->
+			<div v-else
+				class="mt-12 overflow-hidden rounded-[2.5rem] border-2 border-dashed border-gray-200 bg-white/50 py-24 text-center">
+				<div
+					class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-xl text-3xl">
+					{{ posts.length ? '🔍' : '📁' }}
+				</div>
+				<h2 class="editorial-display text-3xl font-bold text-gray-900">
+					{{ posts.length ? "No Matching Records" : "Archive is Empty" }}
 				</h2>
-				<p class="mt-3 text-sm leading-6 text-gray-500">
-					{{
-						posts.length
-							? "Try a different search or switch filters to find the blog you need."
-							: "Create your first blog post and come back here to manage it."
-					}}
+				<p class="mx-auto mt-4 max-w-sm text-sm text-gray-500">
+					{{ posts.length ? "Adjust your search parameters or clear filters." : "You haven't authored any publications yet." }}
 				</p>
-				<div class="mt-6 flex flex-wrap justify-center gap-3">
-					<button
-						v-if="posts.length"
-						type="button"
-						class="btn-secondary"
-						@click="resetFilters"
-					>
-						Clear filters
+				<div class="mt-10 flex flex-wrap justify-center gap-4">
+					<button v-if="posts.length" @click="resetFilters"
+						class="border-b-2 border-gray-900 pb-1 text-[10px] font-black uppercase tracking-widest text-gray-900">
+						Reset Filters
 					</button>
-					<router-link to="/create-post" class="btn-primary">
-						Write new blog
+					<router-link to="/create-post"
+						class="bg-[#b42318] px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl">
+						Write First Post
 					</router-link>
 				</div>
 			</div>
@@ -204,7 +136,8 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { blogApi } from "../api/blogServices";
-import { formatDate, getImageUrl } from "../utils/post";
+import { siteApi } from "../api/siteServices";
+import AuthorPostCard from "../components/AuthorPostCard.vue";
 
 const posts = ref([]);
 const loading = ref(true);
@@ -212,9 +145,10 @@ const error = ref("");
 const activeFilter = ref("all");
 const searchQuery = ref("");
 const deletingPostName = ref("");
+const userRoles = ref([]);
 
 const filters = [
-	{ label: "All", value: "all" },
+	{ label: "All Works", value: "all" },
 	{ label: "Published", value: "published" },
 	{ label: "Drafts", value: "drafts" },
 	{ label: "In Review", value: "review" },
@@ -224,59 +158,52 @@ function postStatus(post) {
 	return post.custom_post_status || (post.published ? "Published" : "Draft");
 }
 
-function statusBadgeClass(post) {
-	const status = postStatus(post);
-	if (status === "Published") return "bg-emerald-100 text-emerald-700";
-	if (status === "Submitted for Review") return "bg-sky-100 text-sky-700";
-	if (status === "Rejected") return "bg-red-100 text-red-700";
-	return "bg-amber-100 text-amber-700";
-}
+const isSystemManager = computed(() => userRoles.value.includes("System Manager"));
 
-const publishedCount = computed(() => posts.value.filter((post) => postStatus(post) === "Published").length);
-const draftCount = computed(() => posts.value.filter((post) => postStatus(post) === "Draft").length);
-const reviewCount = computed(
-	() => posts.value.filter((post) => postStatus(post) === "Submitted for Review").length,
-);
+const publishedCount = computed(() => posts.value.filter((p) => postStatus(p) === "Published").length);
+const draftCount = computed(() => posts.value.filter((p) => postStatus(p) === "Draft").length);
+const reviewCount = computed(() => posts.value.filter((p) => postStatus(p) === "Submitted for Review").length);
+
+const statsMap = computed(() => ({
+	'Total Assets': posts.value.length,
+	'Live on Site': publishedCount.value,
+	'In Progress': draftCount.value,
+	'Editorial Review': reviewCount.value
+}));
 
 const filteredPosts = computed(() => {
-	const normalizedQuery = searchQuery.value.trim().toLowerCase();
-
+	const query = searchQuery.value.toLowerCase();
 	return posts.value.filter((post) => {
-		const matchesFilter =
-			activeFilter.value === "all" ||
+		const matchesFilter = activeFilter.value === "all" ||
 			(activeFilter.value === "published" && postStatus(post) === "Published") ||
 			(activeFilter.value === "drafts" && postStatus(post) === "Draft") ||
 			(activeFilter.value === "review" && postStatus(post) === "Submitted for Review");
 
-		if (!matchesFilter) return false;
-		if (!normalizedQuery) return true;
-
-		const haystack = [post.title, post.blog_category, post.blog_intro]
-			.filter(Boolean)
-			.join(" ")
-			.toLowerCase();
-
-		return haystack.includes(normalizedQuery);
+		const haystack = `${post.title} ${post.blog_category} ${post.blog_intro}`.toLowerCase();
+		return matchesFilter && haystack.includes(query);
 	});
 });
 
-function primaryActionLink(post) {
-	return { name: "CreatePost", params: { name: post.name } };
+function canEditInWebsiteEditor(post) {
+	return !post?.published || isSystemManager.value;
 }
 
-function viewPostLink(post) {
-	return { name: "PostDetail", params: { name: post.name } };
+function canDeletePost(post) {
+	return !post?.published;
 }
+
+function primaryActionLink(post) {
+	return canEditInWebsiteEditor(post)
+		? { name: "CreatePost", params: { name: post.name } }
+		: viewPostLink(post);
+}
+
+function viewPostLink(post) { return { name: "PostDetail", params: { name: post.name } }; }
 
 function primaryActionLabel(post) {
-	if (postStatus(post) === "Published") {
-		return "Edit published blog";
-	}
-
-	if (postStatus(post) === "Submitted for Review") {
-		return "Edit submission";
-	}
-
+	if (postStatus(post) === "Published" && !canEditInWebsiteEditor(post)) return "View published blog";
+	if (postStatus(post) === "Published") return "Edit published blog";
+	if (postStatus(post) === "Submitted for Review") return "Edit submission";
 	return "Edit draft";
 }
 
@@ -288,27 +215,30 @@ function resetFilters() {
 async function fetchPosts() {
 	loading.value = true;
 	error.value = "";
-
 	try {
-		posts.value = await blogApi.getMyBlogs();
+		const [blogs, roles] = await Promise.all([
+			blogApi.getMyBlogs(),
+			siteApi.getCurrentUserRoles().catch(() => []),
+		]);
+		posts.value = blogs;
+		userRoles.value = Array.isArray(roles) ? roles : [];
 	} catch (err) {
-		error.value = err.message || "Unable to load your blogs.";
+		error.value = err.message || "Archive unavailable.";
 		posts.value = [];
+		userRoles.value = [];
 	} finally {
 		loading.value = false;
 	}
 }
 
 async function deletePost(post) {
-	if (!post?.name) return;
-	if (!window.confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
-
+	if (!window.confirm(`Permanently remove "${post.title}"?`)) return;
 	deletingPostName.value = post.name;
 	try {
 		await blogApi.deleteMyPendingPost(post.name);
 		posts.value = posts.value.filter((item) => item.name !== post.name);
 	} catch (err) {
-		error.value = err.message || "Unable to delete this blog.";
+		console.error(err);
 	} finally {
 		deletingPostName.value = "";
 	}
@@ -316,3 +246,15 @@ async function deletePost(post) {
 
 onMounted(fetchPosts);
 </script>
+
+<style scoped>
+main {
+	overflow-y: auto;
+	scroll-behavior: smooth;
+}
+
+.editorial-display {
+	font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased;
+}
+</style>

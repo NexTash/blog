@@ -190,6 +190,11 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	font-size: 1.0625rem;
 	line-height: 1.85;
 	color: #334155;
+	min-width: 0;
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+	white-space: normal;
 }
 
 .article-content h1,
@@ -219,6 +224,23 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	font-size: 1.125rem;
 }
 
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content p,
+.article-content li,
+.article-content blockquote,
+.article-content details[data-type="faq-accordion"] summary,
+.article-content details.faq-accordion summary,
+.article-content th,
+.article-content td {
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+	white-space: normal;
+}
+
 .article-content p {
 	margin: 1.25rem 0;
 }
@@ -227,6 +249,8 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	color: #b42318;
 	text-decoration: underline;
 	text-underline-offset: 3px;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .article-content a:hover {
@@ -371,12 +395,18 @@ watch(() => route.params.name, fetchFullPost, { immediate: true });
 	margin: 0.4rem 0;
 }
 
+.article-content * {
+	max-width: 100%;
+}
+
 .article-content code {
 	background: #f1f5f9;
 	padding: 0.15em 0.4em;
 	border-radius: 3px;
 	font-size: 0.9em;
 	font-family: ui-monospace, monospace;
+	overflow-wrap: normal;
+	word-break: normal;
 }
 
 .article-content pre {

@@ -469,7 +469,7 @@ const headerTitle = computed(() => {
 
 const submitButtonLabel = computed(() => {
     if (isSystemManager.value) {
-        if (isEditingPublishedPost.value) return "Save & Publish";
+        if (isEditingPublishedPost.value) return "Publish Changes";
         return isEditing.value ? "Publish Changes" : "Publish Now";
     }
 
@@ -479,7 +479,7 @@ const submitButtonLabel = computed(() => {
 
 const saveButtonLabel = computed(() => {
     if (isEditingPublishedPost.value) {
-        return isSystemManager.value ? "Save & Publish" : "Save for Review";
+        return isSystemManager.value ? "Save Changes" : "Save for Review";
     }
 
     return "Save Progress";
@@ -849,6 +849,11 @@ onUnmounted(() => {
     font-size: 1.0625rem;
     line-height: 1.85;
     color: #334155;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
 }
 
 .article-content h1,
@@ -876,6 +881,23 @@ onUnmounted(() => {
 
 .article-content h4 {
     font-size: 1.125rem;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content p,
+.article-content li,
+.article-content blockquote,
+.article-content details[data-type="faq-accordion"] summary,
+.article-content details.faq-accordion summary,
+.article-content th,
+.article-content td {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
 }
 
 .article-content .article-cta {
@@ -934,6 +956,8 @@ onUnmounted(() => {
     color: #b42318;
     text-decoration: underline;
     text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .article-content a:hover {
@@ -1030,12 +1054,18 @@ onUnmounted(() => {
     margin: 0.4rem 0;
 }
 
+.article-content * {
+    max-width: 100%;
+}
+
 .article-content code {
     background: #f1f5f9;
     padding: 0.15em 0.4em;
     border-radius: 3px;
     font-size: 0.9em;
     font-family: ui-monospace, monospace;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .article-content pre {

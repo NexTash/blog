@@ -177,8 +177,7 @@ const searchResults = computed(() => {
 			(p) =>
 				p.title?.toLowerCase().includes(q) ||
 				p.blog_category?.toLowerCase().includes(q) ||
-				p.blog_intro?.toLowerCase().includes(q) ||
-				p.content?.toLowerCase().includes(q),
+				p.blog_intro?.toLowerCase().includes(q),
 		)
 		.slice(0, 6);
 });
