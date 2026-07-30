@@ -1,61 +1,62 @@
-<template>
-	<main class="min-h-screen bg-white">
-		<div class="border-b border-gray-200 bg-[#f6f3ee] px-4 py-3">
-			<div class="mx-auto max-w-4xl">
-				<nav class="flex items-center gap-2 text-sm font-bold" aria-label="Breadcrumb">
-					<router-link to="/" class="text-[#b42318] transition-colors hover:underline">Home</router-link>
-					<span class="text-gray-500" aria-hidden="true"> > </span>
-					<span v-if="postData" class="truncate text-[#b42318]">{{
-						postData.title
-					}}</span>
-					<span v-else class="text-gray-400">Loading...</span>
-				</nav>
-			</div>
-		</div>
-
-		<div class="mx-auto max-w-4xl px-4 py-10 md:px-6 md:py-14">
-			<div v-if="loading" class="flex flex-col items-center justify-center py-24">
-				<div class="h-10 w-10 animate-spin rounded-full border-b-2 border-[#b42318]"></div>
+	<template>
+		<main class="min-h-screen bg-white">
+			<div class="border-b border-gray-200 bg-[#f6f3ee] px-4 py-3">
+				<div class="mx-auto max-w-4xl">
+					<nav class="flex items-center gap-2 text-sm font-bold" aria-label="Breadcrumb">
+						<router-link to="/" class="text-[#b42318] transition-colors hover:underline">Home</router-link>
+						<span class="text-gray-500" aria-hidden="true"> > </span>
+						<span v-if="postData" class="truncate text-[#b42318]">{{
+							postData.title
+						}}</span>
+						<span v-else class="text-gray-400">Loading...</span>
+					</nav>
+				</div>
 			</div>
 
-			<article v-else-if="postData">
-				<router-link v-if="postData.blog_category"
-					:to="{ name: 'Category', params: { slug: postData.blog_category } }"
-					class="kicker transition-colors hover:underline">
-					{{ postData.blog_category }}
-				</router-link>
-				<span v-else class="kicker">Uncategorized</span>
-
-				<h1 class="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-[34px] md:text-[38px]">
-					{{ postData.title }}
-				</h1>
-
-				<div
-					class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold uppercase tracking-[0.14em] text-gray-400">
-					<span>{{
-						formatDate(postData.published_on, {
-							month: "long",
-							day: "numeric",
-							year: "numeric",
-						})
-					}}</span>
-					<span aria-hidden="true" class="text-gray-300">|</span>
-					<span>{{ postData.blogger || "Theme Admin" }}</span>
-					<span aria-hidden="true" class="text-gray-300">|</span>
-					<span>{{ formatClickCount(postData.custom_click_count) }}</span>
+			<div class="mx-auto max-w-4xl px-4 py-10 md:px-6 md:py-14">
+				<div v-if="loading" class="flex flex-col items-center justify-center py-24">
+					<div class="h-10 w-10 animate-spin rounded-full border-b-2 border-[#b42318]"></div>
 				</div>
 
-				<div class="my-10 overflow-hidden rounded-lg bg-gray-100 shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
-					<img :src="getImageUrl(postData.meta_image)" :alt="postData.title"
-						class="max-h-[520px] w-full object-cover" />
-				</div>
+				<article v-else-if="postData">
+					<router-link v-if="postData.blog_category"
+						:to="{ name: 'Category', params: { slug: postData.blog_category } }"
+						class="kicker transition-colors hover:underline">
+						{{ postData.blog_category }}
+					</router-link>
+					<span v-else class="kicker">Uncategorized</span>
 
-				<p v-if="postData.blog_intro"
-					class="py-4 pl-5 pr-4 text-xl leading-8 md:text-2xl bg-[#CC2929] opacity-85 text-white shadow-xl/20 rounded-2xl">
-					{{ postData.blog_intro }}
-				</p>
+					<h1
+						class="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-[34px] md:text-[38px]">
+						{{ postData.title }}
+					</h1>
 
-				<hr v-if="postData.blog_intro" class="my-10 border-gray-200" />
+					<div
+						class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold uppercase tracking-[0.14em] text-gray-400">
+						<span>{{
+							formatDate(postData.published_on, {
+								month: "long",
+								day: "numeric",
+								year: "numeric",
+							})
+						}}</span>
+						<span aria-hidden="true" class="text-gray-300">|</span>
+						<span>{{ postData.blogger || "Theme Admin" }}</span>
+						<span aria-hidden="true" class="text-gray-300">|</span>
+						<span>{{ formatClickCount(postData.custom_click_count) }}</span>
+					</div>
+
+					<div class="my-10 overflow-hidden rounded-lg bg-gray-100 shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
+						<img :src="getImageUrl(postData.meta_image)" :alt="postData.title"
+							class="max-h-[520px] w-full object-cover" />
+					</div>
+
+					<p v-if="postData.blog_intro"
+						class="bg-black/85 rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
+						{{ postData.blog_intro }}
+					</p>
+
+					<hr v-if="postData.blog_intro" class="my-10 border-gray-200" />
 
 					<div class="article-content" v-html="safeContent"></div>
 
@@ -63,76 +64,77 @@
 						class="mt-12 rounded-xl border border-gray-100 bg-gray-50 p-8 shadow-sm">
 						<div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
 							<div class="min-w-0 flex-1">
-						<h3
-							class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
-							Sources & Resources
-						</h3>
-						<ul v-if="safeBacklinks.length" class="space-y-4">
-								<li v-for="(link, index) in safeBacklinks" :key="index"
-									class="flex items-start gap-3 group">
-								<svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
-									fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-								</svg>
-								<a :href="link.href" target="_blank" rel="noopener noreferrer"
-									class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
-									{{ link.label }}
-									</a>
-								</li>
-							</ul>
+								<h3
+									class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 flex items-center gap-2">
+									Sources & Resources
+								</h3>
+								<ul v-if="safeBacklinks.length" class="space-y-4">
+									<li v-for="(link, index) in safeBacklinks" :key="index"
+										class="flex items-start gap-3 group">
+										<svg class="h-5 w-5 text-[#b42318] mt-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
+											fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+										</svg>
+										<a :href="link.href" target="_blank" rel="noopener noreferrer"
+											class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
+											{{ link.label }}
+										</a>
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 
-				<div class="mt-14 border-t border-gray-200 pt-8">
-					<button @click="$router.back()"
-						class="px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-white transition-colors border border-white/20 rounded-[10px] bg-red-600">
-						Back to Blogs
+					<div class="mt-14 border-t border-gray-200 pt-8">
+						<button @click="$router.back()"
+							class="px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-white transition-colors border border-white/20 rounded-[10px] bg-red-600">
+							Back to Blogs
+						</button>
+					</div>
+				</article>
+
+				<div v-else
+					class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-24 text-center">
+					<p class="text-xl font-bold text-gray-500">Post not found.</p>
+					<button @click="$router.push('/')"
+						class="mt-4 text-sm font-bold uppercase tracking-[0.16em] text-[#b42318] hover:underline">
+						Go Home
 					</button>
 				</div>
-			</article>
-
-			<div v-else
-				class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-24 text-center">
-				<p class="text-xl font-bold text-gray-500">Post not found.</p>
-				<button @click="$router.push('/')"
-					class="mt-4 text-sm font-bold uppercase tracking-[0.16em] text-[#b42318] hover:underline">
-					Go Home
-				</button>
 			</div>
-		</div>
-		<div class="border-t border-gray-200 bg-[#f8f6f2] px-4 py-10 md:px-6">
-			<div class="mx-auto max-w-4xl">
-				<div class="rounded-2xl border border-[#eadfd3] bg-white p-6 shadow-sm md:p-8">
-					<div class="flex items-start gap-4">
-						<!-- <div
-							class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#b42318] text-white shadow-sm">
-							<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round"
-									d="M13 16h-1v-4h-1m1-4h.01M12 21a9 9 0 100-18 9 9 0 000 18z" />
-							</svg>
-						</div> -->
+			<div class="border-t border-gray-200 bg-[#f8f6f2] px-4 py-10 md:px-6">
+				<div class="mx-auto max-w-4xl">
+					<div class="rounded-2xl border border-[#eadfd3] bg-white p-6 shadow-sm md:p-8">
+						<div class="flex items-start gap-4">
+							<!-- <div
+								class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#b42318] text-white shadow-sm">
+								<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round"
+										d="M13 16h-1v-4h-1m1-4h.01M12 21a9 9 0 100-18 9 9 0 000 18z" />
+								</svg>
+							</div> -->
 
-						<div>
-							<!-- <p class="kicker">Disclosure Policy</p> -->
-							<h2 class="mt-2 text-xl font-black tracking-tight text-gray-900">
-								Disclosure Policy
-							</h2>
-							<p class="mt-3 text-sm leading-7 text-gray-600 md:text-[15px]">
-								Some links in this article may point to partner products or services. If you choose to
-								use them, we may earn a commission at no extra cost to you. Our editorial content is
-								written to be useful, clear, and independent regardless of any partner relationship.
-							</p>
+							<div>
+								<!-- <p class="kicker">Disclosure Policy</p> -->
+								<h2 class="mt-2 text-xl font-black tracking-tight text-gray-900">
+									Disclosure Policy
+								</h2>
+								<p class="mt-3 text-sm leading-7 text-gray-600 md:text-[15px]">
+									Some links in this article may point to partner products or services. If you choose
+									to
+									use them, we may earn a commission at no extra cost to you. Our editorial content is
+									written to be useful, clear, and independent regardless of any partner relationship.
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-	</main>
+		</main>
 
-</template>
+	</template>
 
 <script setup>
 import { computed, ref, watch } from "vue";

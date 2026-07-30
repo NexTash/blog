@@ -70,6 +70,13 @@ const nofollowButton = {
 	isDisabled: (editor) => !editor?.isActive("link"),
 };
 
+const justifyButton = {
+	label: "Align justify",
+	text: "J",
+	action: (editor) => editor.chain().focus().setTextAlign("justify").run(),
+	isActive: (editor) => editor?.isActive?.({ textAlign: "justify" }),
+};
+
 const faqButton = {
 	label: "Insert FAQ / accordion block",
 	text: "FAQ",
@@ -179,6 +186,7 @@ const editorButtons = computed(() => {
 		"Align Left",
 		"Align Center",
 		"Align Right",
+		justifyButton,
 		"Separator",
 		"Image",
 		"Video",

@@ -313,9 +313,8 @@
                                         :alt="form.title || 'Preview cover image'"
                                         class="max-h-[520px] w-full object-cover" />
                                 </div>
-
-                                <p v-if="form.blog_intro" class=" py-4 pl-5 pr-4 text-xl leading-8 md:text-2xl
-                                    bg-[#CC2929] opacity-85 text-white shadow-xl/20 rounded-2xl">
+                                <p v-if="form.blog_intro"
+                                    class="bg-black/85 rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
                                     {{ form.blog_intro }}
                                 </p>
 
