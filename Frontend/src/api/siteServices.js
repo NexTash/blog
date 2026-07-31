@@ -5,6 +5,10 @@ export const siteApi = {
 		return request("frappe.auth.get_logged_user");
 	},
 
+	getAboutCompanyContent() {
+		return request("blog.api.get_about_company_content");
+	},
+
 	getCurrentUserRoles() {
 		return request("blog.api.get_current_user_roles");
 	},

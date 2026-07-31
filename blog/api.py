@@ -727,6 +727,26 @@ def get_advertisement():
 
 
 @frappe.whitelist(allow_guest=True)
+def get_about_company_content():
+	try:
+		doc = frappe.get_single("About Company")
+	except frappe.DoesNotExistError:
+		return {
+			"about_us": "",
+			"privacy_policy": "",
+			"terms_and_conditions": "",
+			"modified": None,
+		}
+
+	return {
+		"about_us": doc.about_us or "",
+		"privacy_policy": doc.privacy_policy or "",
+		"terms_and_conditions": doc.terms_and_conditions or "",
+		"modified": doc.modified,
+	}
+
+
+@frappe.whitelist(allow_guest=True)
 def track_traffic(
 	route=None,
 	route_name=None,

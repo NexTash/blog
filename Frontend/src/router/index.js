@@ -12,6 +12,26 @@ const routes = [
 		component: () => import("../views/Category.vue"),
 	},
 	{
+		path: "/about-us",
+		name: "AboutUs",
+		component: () => import("../views/AboutUs.vue"),
+	},
+	{
+		path: "/privacy-policy",
+		name: "PrivacyPolicy",
+		component: () => import("../views/PrivacyPolicy.vue"),
+	},
+	{
+		path: "/terms-and-conditions",
+		name: "TermsAndConditions",
+		component: () => import("../views/TermsAndConditions.vue"),
+	},
+	{
+		path: "/disclosure-policy",
+		name: "DisclosurePolicy",
+		component: () => import("../views/DisclosurePolicy.vue"),
+	},
+	{
 		path: "/create-post/:name?",
 		name: "CreatePost",
 		component: () => import("../views/CreatePost.vue"),

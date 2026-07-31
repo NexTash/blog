@@ -43,7 +43,7 @@
 							</div>
 						</div>
 						<a href="#" class="nav-link" @click="closeMobile">Guides</a>
-						<a href="#" class="nav-link" @click="closeMobile">About Us</a>
+						<router-link to="/about-us" class="nav-link" @click="closeMobile">About Us</router-link>
 					</div>
 				</div>
 
@@ -106,10 +106,11 @@
 		<!-- Mobile menu -->
 		<transition name="slide-fade">
 			<div v-if="isMobileMenuOpen" class="border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden">
-				<router-link to="/" class="mobile-link" @click="closeMobile">Home</router-link>
-				<a href="#latest" class="mobile-link" @click="closeMobile">Latest</a>
-				<a href="#popular" class="mobile-link" @click="closeMobile">Popular</a>
-				<div class="mt-1 border-t border-gray-100 pt-2">
+					<router-link to="/" class="mobile-link" @click="closeMobile">Home</router-link>
+					<a href="#latest" class="mobile-link" @click="closeMobile">Latest</a>
+					<a href="#popular" class="mobile-link" @click="closeMobile">Popular</a>
+					<router-link to="/about-us" class="mobile-link" @click="closeMobile">About Us</router-link>
+					<div class="mt-1 border-t border-gray-100 pt-2">
 					<p class="px-3 pb-1 text-[11px] font-black uppercase tracking-[0.14em] text-gray-400">
 						Categories
 					</p>

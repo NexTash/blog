@@ -68,12 +68,9 @@
 					<h4 class="mb-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400">Navigate</h4>
 					<nav class="flex flex-col gap-2.5">
 						<router-link to="/" class="footer-link">Home</router-link>
-						<a href="#" class="footer-link">Categories</a>
-						<a href="#" class="footer-link">Guides</a>
-						<a href="#" class="footer-link">About Us</a>Disclosure Policy
-						This post may contain links to partner services. We may receive compensation if you use these
-						services, at no extra cost to you.
-
+						<router-link to="/categories" class="footer-link">Categories</router-link>
+						<router-link to="/guides" class="footer-link">Guides</router-link>
+						<router-link to="/about-us" class="footer-link">About Us</router-link>
 					</nav>
 				</div>
 
@@ -81,10 +78,10 @@
 				<div>
 					<h4 class="mb-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400">Company</h4>
 					<nav class="flex flex-col gap-2.5">
-						<a href="#" class="footer-link">About Us</a>
-						<a href="#" class="footer-link">Privacy Policy</a>
-						<a href="#" class="footer-link">Terms of Use</a>
-						<a href="#" class="footer-link">Disclosure Policy</a>
+						<router-link to="/about-us" class="footer-link">About Us</router-link>
+						<router-link to="/privacy-policy" class="footer-link">Privacy Policy</router-link>
+						<router-link to="/terms-and-conditions" class="footer-link">Terms of Use</router-link>
+						<router-link to="/disclosure-policy" class="footer-link">Disclosure Policy</router-link>
 					</nav>
 				</div>
 			</div>
