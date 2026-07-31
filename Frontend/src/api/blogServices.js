@@ -73,6 +73,7 @@ export const blogApi = {
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
 		formData.append("status", payload.status || "Submitted for Review");
+		formData.append("intro_background_color", payload.intro_background_color || "");
 
 		if (payload.meta_image) {
 			formData.append("meta_image", payload.meta_image);
@@ -97,6 +98,7 @@ export const blogApi = {
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
 		formData.append("status", payload.status || "Draft");
+		formData.append("intro_background_color", payload.intro_background_color || "");
 
 		if (payload.meta_image) {
 			formData.append("meta_image", payload.meta_image);
@@ -130,6 +132,7 @@ export const blogApi = {
 		formData.append("tags", JSON.stringify(payload.tags || []));
 		formData.append("backlinks", JSON.stringify(payload.backlinks || []));
 		formData.append("status", payload.status || "Submitted for Review");
+		formData.append("intro_background_color", payload.intro_background_color || "");
 
 		if (payload.meta_image) {
 			formData.append("meta_image", payload.meta_image);

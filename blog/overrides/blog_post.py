@@ -5,7 +5,6 @@ from frappe.website.doctype.blog_post.blog_post import (
 )
 
 
-BLOG_INTRO_MAX_LENGTH = 10000
 META_TITLE_MAX_LENGTH = 60
 META_DESCRIPTION_MAX_LENGTH = 140
 
@@ -16,10 +15,7 @@ class BlogPost(FrappeBlogPost):
 
 		if not self.blog_intro:
 			content = get_html_content_based_on_type(self, "content", self.content_type)
-			self.blog_intro = strip_html_tags(content[:BLOG_INTRO_MAX_LENGTH])
-
-		if self.blog_intro:
-			self.blog_intro = self.blog_intro[:BLOG_INTRO_MAX_LENGTH]
+			self.blog_intro = strip_html_tags(content)
 
 		if not self.meta_title:
 			self.meta_title = self.title[:META_TITLE_MAX_LENGTH]

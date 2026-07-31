@@ -132,6 +132,37 @@
                                     <textarea id="story-summary" v-model="form.blog_intro" rows="3"
                                         placeholder="A brief hook or meta description..."
                                         class="w-full border-none p-0 text-lg italic text-gray-600 placeholder-gray-300 focus:ring-0 outline-none resize-none"></textarea>
+                                    <div class="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                                        <div>
+                                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-700">Summary Background</p>
+                                            <p class="mt-1 text-xs text-gray-500">Choose the highlight color shown behind the summary.</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input
+                                                id="summary-background"
+                                                v-model="form.intro_background_color"
+                                                type="color"
+                                                class="h-11 w-14 cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+                                                :aria-label="`Summary background color ${form.intro_background_color}`"
+                                            />
+                                            <input
+                                                v-model="form.intro_background_color"
+                                                type="text"
+                                                inputmode="text"
+                                                class="w-28 rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-700 outline-none transition-colors focus:border-black focus:ring-1 focus:ring-black"
+                                            />
+                                            <button
+                                                type="button"
+                                                @click="resetIntroBackgroundColor"
+                                                class="rounded-xl border border-gray-300 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-gray-600 transition-colors hover:border-black hover:text-black"
+                                            >
+                                                Reset
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3 text-right text-[11px] font-bold text-gray-400">
+                                        {{ form.blog_intro.length }} characters
+                                    </p>
                                 </div>
                             </template>
                         </div>
@@ -314,7 +345,8 @@
                                         class="max-h-[520px] w-full object-cover" />
                                 </div>
                                 <p v-if="form.blog_intro"
-                                    class="bg-black/85 rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
+                                    :style="previewIntroStyle"
+                                    class="rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
                                     {{ form.blog_intro }}
                                 </p>
 
@@ -373,6 +405,8 @@ import { siteApi } from "../api/siteServices";
 import PostBodyEditor from "../components/PostBodyEditor.vue";
 import { formatDate, getImageUrl, getSafeUrl, sanitizeHtml, stripHtml } from "../utils/post";
 
+const DEFAULT_INTRO_BACKGROUND_COLOR = "#CC2929";
+
 // Hooks & Routing
 const route = useRoute();
 const router = useRouter();
@@ -414,6 +448,7 @@ const tagInput = ref("");
 const form = reactive({
     title: "",
     blog_intro: "",
+    intro_background_color: DEFAULT_INTRO_BACKGROUND_COLOR,
     content: "",
     category: "",
     tags: [],
@@ -443,6 +478,8 @@ const isFormValid = computed(() => {
     return hasTitle && hasContent;
 });
 const wordCount = computed(() => plainContent.value.split(/\s+/).filter(Boolean).length);
+const normalizedIntroBackgroundColor = computed(() => normalizeIntroBackgroundColor(form.intro_background_color));
+const previewIntroStyle = computed(() => ({ backgroundColor: normalizedIntroBackgroundColor.value }));
 const previewContent = computed(() => sanitizeHtml(form.content));
 const previewBacklinks = computed(() =>
     form.backlinks
@@ -518,6 +555,17 @@ const saveToLocal = async () => {
 
 
 
+function normalizeIntroBackgroundColor(value) {
+    const normalizedValue = String(value || "").trim();
+    return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(normalizedValue)
+        ? normalizedValue
+        : DEFAULT_INTRO_BACKGROUND_COLOR;
+}
+
+function resetIntroBackgroundColor() {
+    form.intro_background_color = DEFAULT_INTRO_BACKGROUND_COLOR;
+}
+
 function revokeObjectPreviewUrl() {
     if (objectPreviewUrl.value) {
         URL.revokeObjectURL(objectPreviewUrl.value);
@@ -541,6 +589,7 @@ function buildSubmitPayload() {
     return {
         title: form.title.trim(),
         blog_intro: form.blog_intro.trim(),
+        intro_background_color: normalizeIntroBackgroundColor(form.intro_background_color),
         content: normalizeLegacyFaqEditorContent(form.content),
         category: form.category,
         tags: [...form.tags],
@@ -561,6 +610,7 @@ function applyPostToForm(post) {
     currentPostPublished.value = Boolean(post.published);
     form.title = post.title || "";
     form.blog_intro = post.blog_intro || "";
+    form.intro_background_color = normalizeIntroBackgroundColor(post.custom_intro_background_color);
     form.content = normalizeLegacyFaqEditorContent(post.content || "");
     form.category = post.blog_category || "";
     form.tags = Array.isArray(post.tags) ? [...post.tags] : [];
@@ -580,6 +630,7 @@ function resetComposerState() {
     Object.assign(form, {
         title: "",
         blog_intro: "",
+        intro_background_color: DEFAULT_INTRO_BACKGROUND_COLOR,
         content: "",
         category: categories.value[0]?.name || "",
         tags: [],

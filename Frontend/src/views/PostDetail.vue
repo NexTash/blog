@@ -52,11 +52,12 @@
 					</div>
 
 					<p v-if="postData.blog_intro"
-						class="bg-black/85 rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
+						:style="introStyle"
+						class="rounded-2xl px-4 pl-5 py-4 text-justify text-lg leading-normal text-white shadow-xl md:text-lg md:leading-normal">
 						{{ postData.blog_intro }}
 					</p>
 
-					<hr v-if="postData.blog_intro" class="my-10 border-gray-200" />
+					<hr v-if="postData.blog_intro" class="my-2 border-gray-200" />
 
 					<div class="article-content" v-html="safeContent"></div>
 
@@ -142,11 +143,22 @@ import { useRoute } from "vue-router";
 import { blogApi } from "../api/blogServices";
 import { formatDate, getImageUrl, getSafeUrl, sanitizeHtml } from "../utils/post";
 
+const DEFAULT_INTRO_BACKGROUND_COLOR = "#CC2929";
 const route = useRoute();
 const postData = ref(null);
 const loading = ref(true);
 const error = ref("");
 
+function normalizeIntroBackgroundColor(value) {
+	const normalizedValue = String(value || "").trim();
+	return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(normalizedValue)
+		? normalizedValue
+		: DEFAULT_INTRO_BACKGROUND_COLOR;
+}
+
+const introStyle = computed(() => ({
+	backgroundColor: normalizeIntroBackgroundColor(postData.value?.custom_intro_background_color),
+}));
 const safeContent = computed(() => sanitizeHtml(postData.value?.content));
 const safeBacklinks = computed(() =>
 	(postData.value?.custom_backlinks || [])

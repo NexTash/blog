@@ -17,13 +17,12 @@
 			<div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
 				<!-- Brand -->
 				<router-link to="/" class="group max-w-2xl">
-					<!-- <p class="kicker mb-2">GUIDES & RESOURCES</p> -->
-					<h1
-						class="text-2xl md:text-2xl lg:text-3xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318]" style="font-weight:900">
+					<h1 class="text-2xl md:text-2xl lg:text-3xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318]"
+						style="font-weight:900">
 						LeadOrbitUSA
-					</h1>
-					<p class="mt-3 max-w-xl text-sm leading-6 text-[#b42318] md:text-base">
-						Helping you spend smarter on the decisions that matter most.
+				</h1>
+					<p class="mt-3 whitespace-nowrap text-sm leading-6 text-[#b42318] md:text-base">
+						Helping you spend smarter on the decisions that matter most!
 					</p>
 				</router-link>
 

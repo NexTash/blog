@@ -40,6 +40,8 @@ DRAFT_STATUS = "Draft"
 REVIEW_STATUS = "Submitted for Review"
 PUBLISHED_STATUS = "Published"
 REJECTED_STATUS = "Rejected"
+DEFAULT_INTRO_BACKGROUND_COLOR = "#CC2929"
+HEX_COLOR_PATTERN = re.compile(r"^#(?:[0-9a-fA-F]{3}){1,2}$")
 CTA_BLOCK_PATTERN = re.compile(
 	r"<blockquote>\s*<p>\s*CTA:\s*.*?</p>(?:\s*<p>\s*URL:\s*.*?</p>)?\s*</blockquote>\s*(?:<p>\s*</p>)?",
 	re.IGNORECASE | re.DOTALL,
@@ -63,6 +65,10 @@ def _blog_post_has_status_field():
 
 def _blog_post_has_click_field():
 	return frappe.get_meta("Blog Post").has_field("custom_click_count")
+
+
+def _blog_post_has_intro_background_field():
+	return frappe.get_meta("Blog Post").has_field("custom_intro_background_color")
 
 
 def _blog_post_list_fields(*extra_fields):
@@ -98,6 +104,29 @@ def _get_post_click_count(post):
 		return int(getattr(post, "custom_click_count", 0) or 0)
 	except (TypeError, ValueError):
 		return 0
+
+
+def _normalize_intro_background_color(value, fallback=DEFAULT_INTRO_BACKGROUND_COLOR):
+	normalized_value = str(value or "").strip()
+	if HEX_COLOR_PATTERN.fullmatch(normalized_value):
+		return normalized_value
+	return fallback
+
+
+def _set_post_intro_background_color(target, value):
+	if not _blog_post_has_intro_background_field():
+		return
+
+	normalized_value = _normalize_intro_background_color(value)
+	if isinstance(target, dict):
+		target["custom_intro_background_color"] = normalized_value
+		return
+
+	target.custom_intro_background_color = normalized_value
+
+
+def _get_post_intro_background_color(post):
+	return _normalize_intro_background_color(getattr(post, "custom_intro_background_color", None))
 
 
 def _strip_legacy_cta_blocks(content):
@@ -239,6 +268,7 @@ def _serialize_post_for_editor(post):
 		"route": post.route,
 		"modified": post.modified,
 		"custom_click_count": _get_post_click_count(post),
+		"custom_intro_background_color": _get_post_intro_background_color(post),
 		"tags": [tag.strip() for tag in (post.custom_tags or "").split(",") if tag.strip()],
 		"backlinks": backlinks,
 		"custom_backlinks": [
@@ -367,6 +397,7 @@ def create_blog_post(
 	tags=None,
 	backlinks=None,
 	status=None,
+	intro_background_color=None,
 ):
 	blogger_name = _require_blogger_for_session_user()
 	formatted_tags = _parse_tag_payload(tags)
@@ -390,6 +421,7 @@ def create_blog_post(
 		"route": _build_blog_post_route(title, category),
 	}
 	_set_post_status(post_values, resolved_status)
+	_set_post_intro_background_color(post_values, intro_background_color)
 	doc = frappe.get_doc(post_values)
 	doc.insert()
 
@@ -456,6 +488,7 @@ def update_my_pending_post(
 	tags=None,
 	backlinks=None,
 	status=None,
+	intro_background_color=None,
 ):
 	post = _get_owned_post_for_public_editor(name)
 	is_system_manager = _session_user_is_system_manager()
@@ -469,6 +502,7 @@ def update_my_pending_post(
 	post.route = _build_blog_post_route(title, category)
 	post.published = 1 if is_system_manager else 0
 	_set_post_status(post, PUBLISHED_STATUS if is_system_manager else REVIEW_STATUS)
+	_set_post_intro_background_color(post, intro_background_color)
 	post.custom_tags = _parse_tag_payload(tags)
 	post.set("custom_backlinks", [])
 	for backlink in _parse_backlinks_payload(backlinks):
@@ -510,6 +544,7 @@ def save_blog_draft(
 	category="Uncategorized",
 	tags=None,
 	backlinks=None,
+	intro_background_color=None,
 ):
 	resolved_title = _resolve_draft_title(title)
 
@@ -524,6 +559,7 @@ def save_blog_draft(
 		post.blog_category = category or "Uncategorized"
 		post.route = _build_blog_post_route(post.title, post.blog_category)
 		post.custom_tags = _parse_tag_payload(tags)
+		_set_post_intro_background_color(post, intro_background_color)
 		post.set("custom_backlinks", [])
 		for backlink in _parse_backlinks_payload(backlinks):
 			post.append("custom_backlinks", backlink)
@@ -554,6 +590,7 @@ def save_blog_draft(
 				"route": _build_blog_post_route(resolved_title, category or "Uncategorized"),
 			}
 		_set_post_status(post_values, DRAFT_STATUS)
+		_set_post_intro_background_color(post_values, intro_background_color)
 		post = frappe.get_doc(post_values)
 		post.insert()
 
