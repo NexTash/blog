@@ -735,6 +735,7 @@ def get_about_company_content():
 			"about_us": "",
 			"privacy_policy": "",
 			"terms_and_conditions": "",
+			"disclosure_policy":"",
 			"modified": None,
 		}
 
@@ -742,6 +743,7 @@ def get_about_company_content():
 		"about_us": doc.about_us or "",
 		"privacy_policy": doc.privacy_policy or "",
 		"terms_and_conditions": doc.terms_and_conditions or "",
+		"disclosure_policy": doc.disclosure_policy or "hello",
 		"modified": doc.modified,
 	}
 

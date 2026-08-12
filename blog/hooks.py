@@ -13,11 +13,9 @@ app_license = "mit"
 
 fixtures = [
     {
-        "doctype": "Dashboard Chart"
-    },
-    {
-        "doctype": "Notification"
+        "doctype":"About Company"
     }
+
 ]
 # required_apps = []
 

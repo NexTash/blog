@@ -7,7 +7,8 @@
  "field_order": [
   "about_us",
   "terms_and_conditions",
-  "privacy_policy"
+  "privacy_policy",
+  "disclosure_policy"
  ],
  "fields": [
   {
@@ -24,13 +25,18 @@
    "fieldname": "privacy_policy",
    "fieldtype": "Text Editor",
    "label": "Privacy Policy "
+  },
+  {
+   "fieldname": "disclosure_policy",
+   "fieldtype": "Text Editor",
+   "label": "Disclosure Policy"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-01 02:09:01.658986",
+ "modified": "2026-08-12 15:16:28.892961",
  "modified_by": "Administrator",
  "module": "Blog",
  "name": "About Company",
