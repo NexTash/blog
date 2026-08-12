@@ -7,6 +7,8 @@ from frappe.website.doctype.blog_post.blog_post import (
 
 META_TITLE_MAX_LENGTH = 60
 META_DESCRIPTION_MAX_LENGTH = 140
+PUBLISHED_STATUS = "Published"
+DRAFT_STATUS = "Draft"
 
 
 class BlogPost(FrappeBlogPost):
@@ -29,6 +31,15 @@ class BlogPost(FrappeBlogPost):
 
 		if self.published and not self.published_on:
 			self.published_on = today()
+
+		# Keep the custom workflow field aligned with the actual publish flag,
+		# even when the post is changed directly from the backend desk.
+		if self.meta.has_field("custom_post_status"):
+			current_status = str(self.custom_post_status or "").strip()
+			if self.published:
+				self.custom_post_status = PUBLISHED_STATUS
+			elif current_status == PUBLISHED_STATUS:
+				self.custom_post_status = DRAFT_STATUS
 
 		if self.featured:
 			if not self.meta_image:

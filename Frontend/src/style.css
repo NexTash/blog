@@ -88,6 +88,61 @@
 		font-family: "Crimson Pro", Georgia, serif;
 	}
 
+	.company-prose {
+		@apply max-w-none text-[1.02rem] leading-8 text-gray-700;
+	}
+
+	.company-prose h1 {
+		font-family: "Crimson Pro", Georgia, serif;
+		font-size: 2.5rem;
+		line-height: 1.1;
+		@apply mt-10 font-black tracking-tight text-gray-900;
+	}
+
+	@media (min-width: 768px) {
+		.company-prose h1 {
+			font-size: 3rem;
+		}
+	}
+
+	.company-prose h2 {
+		font-family: "Crimson Pro", Georgia, serif;
+		@apply mt-10 text-3xl font-black tracking-tight text-gray-900;
+	}
+
+	.company-prose h3 {
+		@apply mt-8 text-xl font-black tracking-tight text-gray-900;
+	}
+
+	.company-prose > :first-child {
+		@apply mt-0;
+	}
+
+	.company-prose p {
+		@apply my-5;
+	}
+
+	.company-prose ul,
+	.company-prose ol {
+		@apply my-5 space-y-3 pl-6;
+	}
+
+	.company-prose li {
+		@apply pl-1;
+	}
+
+	.company-prose a {
+		@apply font-bold text-[#b42318] underline decoration-[#e4b4a4] underline-offset-4 transition-colors hover:text-[#971b12];
+	}
+
+	.company-prose blockquote {
+		@apply my-8 rounded-[1.5rem] border border-[#ead8cb] bg-[#fbf5ee] px-6 py-5 text-gray-800 shadow-sm;
+	}
+
+	.company-prose strong {
+		@apply font-black text-gray-900;
+	}
+
 	/* Consistent section divider accent */
 	.section-accent {
 		@apply flex items-center gap-3;

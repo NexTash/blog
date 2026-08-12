@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-01 01:52:52.191046",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "about_us",
+  "terms_and_conditions",
+  "privacy_policy",
+  "disclosure_policy"
+ ],
+ "fields": [
+  {
+   "fieldname": "about_us",
+   "fieldtype": "Text Editor",
+   "label": "About Us"
+  },
+  {
+   "fieldname": "terms_and_conditions",
+   "fieldtype": "Text Editor",
+   "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "privacy_policy",
+   "fieldtype": "Text Editor",
+   "label": "Privacy Policy "
+  },
+  {
+   "fieldname": "disclosure_policy",
+   "fieldtype": "Text Editor",
+   "label": "Disclosure Policy"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-12 15:16:28.892961",
+ "modified_by": "Administrator",
+ "module": "Blog",
+ "name": "About Company",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
