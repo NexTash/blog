@@ -16,14 +16,22 @@
 		<div class="px-4 py-4 md:px-4 md:py-4">
 			<div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
 				<!-- Brand -->
-				<router-link to="/" class="group max-w-2xl">
-					<h1 class="text-2xl md:text-2xl lg:text-3xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318]"
-						style="font-weight:900">
-						LeadOrbitUSA
-				</h1>
-					<p class="mt-3 whitespace-nowrap text-sm leading-6 text-[#b42318] md:text-base">
-						Helping you spend smarter on the decisions that matter most!
-					</p>
+
+				<router-link to="/" class="group flex items-center gap-4 max-w-2xl">
+					<!-- Logo Image -->
+					<img src="/LeadsOrbitUSA.jpeg" alt="LeadOrbitUSA Logo"
+						class="h-10 w-auto transition-transform group-hover:scale-105 md:h-12" />
+
+					<!-- Text Branding -->
+					<div>
+						<h1 class="text-2xl md:text-2xl lg:text-3xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-[#b42318]"
+							style="font-weight:900">
+							LeadOrbitUSA
+						</h1>
+						<p class="mt-3 whitespace-nowrap text-sm leading-6 text-[#b42318] md:text-base">
+							Helping you spend smarter on the decisions that matter most!
+						</p>
+					</div>
 				</router-link>
 
 				<!-- Guest actions -->
