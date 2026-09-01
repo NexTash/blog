@@ -1,0 +1,1 @@
+import{Dt as e,Xt as t}from"./frappe-te-code-block.ts-D34KFABb.js";import{t as n}from"./CompanyPageLayout-DJaFBrm2.js";var r={__name:`AboutUs`,setup(r){return(r,i)=>(t(),e(n,{"content-key":`about_us`,title:`About Us`,kicker:`Company Story`}))}};export{r as default};

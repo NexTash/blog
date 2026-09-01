@@ -77,7 +77,11 @@
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 												d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
 										</svg>
-										<a :href="link.href" target="_blank" rel="noopener noreferrer"
+										<a
+											v-outbound
+											:href="link.href"
+											target="_blank"
+											rel="noopener noreferrer nofollow"
 											class="text-[15px] font-medium text-gray-600 hover:text-[#b42318] transition-colors break-all leading-snug border-b border-transparent hover:border-[#b42318]">
 											{{ link.label }}
 										</a>

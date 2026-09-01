@@ -1,0 +1,1 @@
+import{Dt as e,Xt as t}from"./frappe-te-code-block.ts-D34KFABb.js";import{t as n}from"./CompanyPageLayout-DJaFBrm2.js";var r={__name:`DisclosurePolicy`,setup(r){return(r,i)=>(t(),e(n,{"content-key":`disclosure_policy`,title:`Disclosure Policy`,kicker:`Company Information`}))}};export{r as default};

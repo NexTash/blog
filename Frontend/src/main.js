@@ -8,6 +8,7 @@ import socket from "../../../doppio/libs/controllers/socket";
 import Auth from "../../../doppio/libs/controllers/auth";
 import { FrappeUI, setConfig, frappeRequest } from "frappe-ui";
 import { installTrafficTracker } from "./utils/traffic";
+import { vOutbound } from "./directives/vOutbound";
 import "frappe-ui/style.css";
 import "./style.css";
 
@@ -18,6 +19,10 @@ const auth = reactive(new Auth());
 app.use(router);
 app.use(resourceManager);
 app.use(FrappeUI);
+
+// Directives
+// v-outbound: intercepts outbound <a> clicks, appends UTM params, strips Referer
+app.directive("outbound", vOutbound);
 
 setConfig("resourceFetcher", frappeRequest);
 

@@ -179,6 +179,10 @@ function normalizeInlineCtaBlocks(root) {
 			link.href = href;
 			link.target = "_blank";
 			link.rel = "noopener noreferrer nofollow";
+			// Marks this link for the delegated outbound handler in App.vue,
+			// which applies UTM rotation + referrer blanking to v-html content
+			// where Vue directives cannot be applied directly.
+			link.setAttribute("data-outbound", "");
 		} else {
 			link.setAttribute("aria-disabled", "true");
 		}
