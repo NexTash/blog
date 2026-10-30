@@ -89,7 +89,7 @@
 		<!-- Bottom bar -->
 		<div class="border-t border-white/10 py-6 text-xs text-gray-500">
 			<div class="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4">
-				<p>&copy; {{ new Date().getFullYear() }} NextNews. All rights reserved.</p>
+				<p>&copy; {{ new Date().getFullYear() }} LeadOrbitUSA. All rights reserved.</p>
 				<p>Powered by NexTash</p>
 			</div>
 		</div>

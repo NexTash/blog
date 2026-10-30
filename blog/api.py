@@ -743,7 +743,7 @@ def get_about_company_content():
 		"about_us": doc.about_us or "",
 		"privacy_policy": doc.privacy_policy or "",
 		"terms_and_conditions": doc.terms_and_conditions or "",
-		"disclosure_policy": doc.disclosure_policy or "hello",
+		"disclosure_policy": doc.disclosure_policy or "",
 		"modified": doc.modified,
 	}
 
@@ -1014,7 +1014,7 @@ def send_emails_to_subscribers(blog_name):
             Read Full Blog
         </a>
         <br><br>
-        <p>Best regards,<br>The NextNews Team</p>
+        <p>Best regards,<br>The LeadOrbitUSA Team</p>
     """
 
     # Send via Frappe's Email Queue system.
